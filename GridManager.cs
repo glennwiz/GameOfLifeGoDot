@@ -8,7 +8,7 @@ public partial class GridManager : Node2D
 	private int gridWidth { get; set;}
 	private int gridHeight { get; set;}
 	private int boxSize = 10;
-	private List<bool[,]> gridStates = new List<bool[,]>();
+	private List<Cell[,]> gridCells = new List<Cell[,]>();
 	private int currentStateIndex = 0; // The index of the current state in the gridStates list we keep track of 100 states
 	Random rand = new Random();
 	
@@ -24,9 +24,9 @@ public partial class GridManager : Node2D
 		var viewportSize = GetViewportRect().Size;
 		gridWidth = (int)viewportSize.X / boxSize;
 		gridHeight = (int)viewportSize.Y / boxSize;
-		var initialState = new bool[gridWidth, gridHeight];
-		initialState[5, 5] = true;  
-		gridStates.Add(initialState);
+		var initialState = new Cell[gridWidth, gridHeight];
+		initialState[5, 5] = new Cell() { IsAlive = true, Position = new Vector2(5, 5) };
+		gridCells.Add(initialState);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -40,12 +40,11 @@ public partial class GridManager : Node2D
 		//we need to update the screen every frame
 		QueueRedraw();
 	}
-	
+
 	public void ToggleCell(Vector2 cellCoords)
 	{
-		//GD.Print("Toggling cell at " + cellCoords);
-		var x = (int)cellCoords.X;
-		var y = (int)cellCoords.Y;
+		var x = (int) cellCoords.X;
+		var y = (int) cellCoords.Y;
 
 		if (x < 0 || x >= gridWidth || y < 0 || y >= gridHeight)
 		{
@@ -53,10 +52,22 @@ public partial class GridManager : Node2D
 			return;
 		}
 
-		var currentGridState = gridStates[currentStateIndex];
-		currentGridState[x, y] = !currentGridState[x, y];
+		var currentGridState = gridCells[currentStateIndex];
+		
+		if(currentGridState[x, y] == null)
+		{
+			currentGridState[x, y] = new Cell()
+			{
+				IsAlive = true, 
+				Position = new Vector2(x, y),
+				Color = new Color((float) rand.NextDouble(), (float) rand.NextDouble(), (float) rand.NextDouble())
+			};
+			return;
+		}
+		
+		currentGridState[x, y].IsAlive = !currentGridState[x, y].IsAlive;
 	}
-	
+
 	private void DrawBox(int x, int y)
 	{
 		if (x < 0 || x >= gridWidth || y < 0 || y >= gridHeight)
@@ -65,12 +76,10 @@ public partial class GridManager : Node2D
 			return;
 		}
 
-		var currentGridState = gridStates[currentStateIndex];
-		currentGridState[x, y] = true;
+		var currentGridState = gridCells[currentStateIndex];
 
-		var color = currentGridState[x, y] 
-			? new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()) 
-			: new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
+		var color = currentGridState[x, y].Color;
+		
 		DrawRect(new Rect2(x * boxSize, y * boxSize, boxSize, boxSize), color);
 	}	
 
@@ -83,30 +92,35 @@ public partial class GridManager : Node2D
 
 	public void SaveState()
 	{
-		var currentGridState = gridStates[currentStateIndex];
-		var newGridState = (bool[,]) currentGridState.Clone();
-		gridStates.Add(newGridState);
+		var currentGridState = gridCells[currentStateIndex];
+		var newGridState = (Cell[,]) currentGridState.Clone();
+		gridCells.Add(newGridState);
 		currentStateIndex++;
 
 		// Optionally, limit the history to the last 100 states
-		if (gridStates.Count > 100)
+		if (gridCells.Count > 100)
 		{
-			gridStates.RemoveAt(0);
+			gridCells.RemoveAt(0);
 			currentStateIndex--;
 		}
 	}
 	
 	public override void _Draw()
 	{
-		var currentGridState = gridStates[currentStateIndex];
+		var currentGridState = gridCells[currentStateIndex];
 		GD.Print("Current state index: " + currentStateIndex);
 		for (int x = 0; x < gridWidth; x++)
 		{
 			for (int y = 0; y < gridHeight; y++)
 			{
-				if (currentGridState[x, y])
+				//Check if there is a cell at this position
+				if (currentGridState[x, y] == null)
 				{
-					//GD.Print("Drawing box at " + x + ", " + y);
+					continue;
+				}
+				
+				if (currentGridState[x, y].IsAlive)
+				{
 					DrawBox(x, y);
 				}
 			}
