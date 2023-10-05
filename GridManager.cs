@@ -26,24 +26,34 @@ public partial class GridManager : Node2D
 		gridWidth = (int)viewportSize.X / _boxSize;
 		gridHeight = (int)viewportSize.Y / _boxSize;
 		var initialState = new Cell[gridWidth, gridHeight];
-		
-		// Loop through the grid and add a random cell
-		Random rand = new Random();
+
+		Color leftColor = new Color(1, 0, 0); // Red
+		Color rightColor = new Color(0, 0, 1); // Blue
+
 		for (int i = 0; i < gridWidth; i++)
 		{
 			for (int j = 0; j < gridHeight; j++)
 			{
+				float t = (float)i / (gridWidth - 1);
+				Color cellColor = LerpColor(leftColor, rightColor, t);
 				initialState[i, j] = new Cell
 				{
-					Color = new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()),
+					Color = cellColor,
 					IsAlive = rand.Next(0, 2) == 1,
 					Position = new Vector2(i, j)
 				};
-
 				GD.Print("the color is: " + initialState[i, j].Color);
 			}
 		}
 		_gridCells.Add(initialState);
+	}
+	
+	private Color LerpColor(Color a, Color b, float t)
+	{
+		float red = a.R + t * (b.R - a.R);
+		float green = a.G + t * (b.G - a.G);
+		float blue = a.B + t * (b.B - a.B);
+		return new Color(red, green, blue);
 	}
 
 	private bool _isMouseDown = false;
@@ -100,12 +110,15 @@ public partial class GridManager : Node2D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		var randomCoords = GetRandomCoords();
-		var randomX = randomCoords.Item1;
-		var randomY = randomCoords.Item2;
+		_timeElapsed += delta;
+		foreach (var cell in _gridCells[_currentStateIndex])
+		{
+			if(_timeElapsed >= 1.5)  
+				cell?.UpdateAlpha(delta);
+		}
 		
 		_timeElapsed += delta;
-		if(_timeElapsed >= 0.1)  
+		if(_timeElapsed >= 0.3)  
 		{
 			_gridCells[_currentStateIndex] = ApplyConwaysRules(_gridCells[_currentStateIndex]);
 			_timeElapsed = 0.0;
