@@ -26,18 +26,64 @@ public partial class GridManager : Node2D
 		gridWidth = (int)viewportSize.X / _boxSize;
 		gridHeight = (int)viewportSize.Y / _boxSize;
 		var initialState = new Cell[gridWidth, gridHeight];
-		initialState[5, 5] = new Cell
+		
+		// Loop through the grid and add a random cell
+		Random rand = new Random();
+		for (int i = 0; i < gridWidth; i++)
 		{
-			IsAlive = true, 
-			Position = new Vector2(5, 5)
-		};
+			for (int j = 0; j < gridHeight; j++)
+			{
+				initialState[i, j] = new Cell
+				{
+					Color = new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()),
+					IsAlive = rand.Next(0, 2) == 1,
+					Position = new Vector2(i, j)
+				};
+
+				GD.Print("the color is: " + initialState[i, j].Color);
+			}
+		}
 		_gridCells.Add(initialState);
 	}
 
+	private bool _isMouseDown = false;
+
+	public override void _Input(InputEvent @event)
+	{
+		if (@event is InputEventMouseButton mouseButtonEvent)
+		{
+			if (mouseButtonEvent.Pressed)
+			{
+				_isMouseDown = mouseButtonEvent.Pressed;
+				if (_isMouseDown) // If the mouse was pressed, then draw at the initial position
+				{
+					var mousePosition = mouseButtonEvent.Position;
+					var x = (int) (mousePosition.X / _boxSize);
+					var y = (int) (mousePosition.Y / _boxSize);
+					ToggleCell(new Vector2(x, y));
+					QueueRedraw();
+				}
+			}
+		}
+		else if (@event is InputEventMouseMotion mouseMotionEvent)
+		{
+			if (_isMouseDown) // If the mouse button is being held, then draw at the new position
+			{
+				var mousePosition = mouseMotionEvent.Position;
+				var x = (int) (mousePosition.X / _boxSize);
+				var y = (int) (mousePosition.Y / _boxSize);
+
+				ToggleCell(new Vector2(x, y));
+				QueueRedraw();
+			}
+		}
+	}
+	
 	public override void _UnhandledInput(InputEvent @event)
 	{
 		if (@event is InputEventMouseButton mouseButtonEvent)
 		{
+			GD.Print("Mouse button event");
 			if (mouseButtonEvent.Pressed)
 			{
 				var mousePosition = mouseButtonEvent.Position;
@@ -48,6 +94,8 @@ public partial class GridManager : Node2D
 			}
 		}
 	}
+	
+	private double _timeElapsed = 0.0;
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
@@ -55,9 +103,15 @@ public partial class GridManager : Node2D
 		var randomCoords = GetRandomCoords();
 		var randomX = randomCoords.Item1;
 		var randomY = randomCoords.Item2;
-		ToggleCell(new Vector2(randomX, randomY));
 		
-		//we need to update the screen every frame
+		_timeElapsed += delta;
+		if(_timeElapsed >= 0.1)  
+		{
+			_gridCells[_currentStateIndex] = ApplyConwaysRules(_gridCells[_currentStateIndex]);
+			_timeElapsed = 0.0;
+		}
+		
+		
 		QueueRedraw();
 	}
 
@@ -128,7 +182,6 @@ public partial class GridManager : Node2D
 	public override void _Draw()
 	{
 		var currentGridState = _gridCells[_currentStateIndex];
-		GD.Print("Current state index: " + _currentStateIndex);
 		for (int x = 0; x < gridWidth; x++)
 		{
 			for (int y = 0; y < gridHeight; y++)
@@ -158,5 +211,68 @@ public partial class GridManager : Node2D
 				DrawLine(new Vector2(0, y * _boxSize), new Vector2(gridWidth * _boxSize, y * _boxSize), new Color(0, 0, 0));
 			}
 		}
+	}
+	
+	public Cell[,] ApplyConwaysRules(Cell[,] currentGrid)
+	{
+		var newGrid = new Cell[gridWidth, gridHeight];
+    
+		// Loop through every cell in current grid
+		for (int x = 0; x < gridWidth; x++)
+		{
+			for (int y = 0; y < gridHeight; y++)
+			{
+				// Count living neighbors
+				int liveNeighbors = CountLiveNeighbors(currentGrid, x, y);
+            
+				// Apply Conway's rules
+				if (currentGrid[x, y]?.IsAlive ?? false)
+				{
+					newGrid[x, y] = new Cell {
+						IsAlive = liveNeighbors == 2 || liveNeighbors == 3,
+						Position = new Vector2(x, y)
+					};
+				}
+				else
+				{
+					newGrid[x, y] = new Cell {
+						Color = new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()),
+						IsAlive = liveNeighbors == 3,
+						Position = new Vector2(x, y)
+					};
+				}
+			}
+		}
+    
+		return newGrid;
+	}
+
+	public int CountLiveNeighbors(Cell[,] grid, int x, int y)
+	{
+		int count = 0;
+
+		// Check all 8 neighbors
+		// (loop through -1 to 1 for x and y, skip 0,0)
+		for (int i = -1; i <= 1; i++)
+		{
+			for (int j = -1; j <= 1; j++)
+			{
+				// Skip the cell itself
+				if (i == 0 && j == 0)
+					continue;
+
+				int nx = x + i;
+				int ny = y + j;
+
+				// Check boundaries
+				if (nx >= 0 && nx < grid.GetLength(0) && ny >= 0 && ny < grid.GetLength(1))
+				{
+					if (grid[nx, ny].IsAlive)
+						count++;
+				}
+			}
+		}
+
+		return count;
 	}
 }
