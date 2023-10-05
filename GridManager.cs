@@ -4,13 +4,14 @@ using System.Collections.Generic;
 
 public partial class GridManager : Node2D
 {
-	private bool debug = true;
+	Random rand = new ();
+	private int _boxSize = 10;
+	private bool _debugState = true;
+	private int _currentStateIndex = 0; // The index of the current state in the gridStates list we keep track of 100 states
+	private List<Cell[,]> _gridCells = new ();
+	
 	private int gridWidth { get; set;}
 	private int gridHeight { get; set;}
-	private int boxSize = 10;
-	private List<Cell[,]> gridCells = new List<Cell[,]>();
-	private int currentStateIndex = 0; // The index of the current state in the gridStates list we keep track of 100 states
-	Random rand = new Random();
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -22,11 +23,30 @@ public partial class GridManager : Node2D
 	private void InitGrid()
 	{
 		var viewportSize = GetViewportRect().Size;
-		gridWidth = (int)viewportSize.X / boxSize;
-		gridHeight = (int)viewportSize.Y / boxSize;
+		gridWidth = (int)viewportSize.X / _boxSize;
+		gridHeight = (int)viewportSize.Y / _boxSize;
 		var initialState = new Cell[gridWidth, gridHeight];
-		initialState[5, 5] = new Cell() { IsAlive = true, Position = new Vector2(5, 5) };
-		gridCells.Add(initialState);
+		initialState[5, 5] = new Cell
+		{
+			IsAlive = true, 
+			Position = new Vector2(5, 5)
+		};
+		_gridCells.Add(initialState);
+	}
+
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (@event is InputEventMouseButton mouseButtonEvent)
+		{
+			if (mouseButtonEvent.Pressed)
+			{
+				var mousePosition = mouseButtonEvent.Position;
+				var x = (int) (mousePosition.X / _boxSize);
+				var y = (int) (mousePosition.Y / _boxSize);
+				ToggleCell(new Vector2(x, y));
+				QueueRedraw();
+			}
+		}
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -52,7 +72,7 @@ public partial class GridManager : Node2D
 			return;
 		}
 
-		var currentGridState = gridCells[currentStateIndex];
+		var currentGridState = _gridCells[_currentStateIndex];
 		
 		if(currentGridState[x, y] == null)
 		{
@@ -76,11 +96,11 @@ public partial class GridManager : Node2D
 			return;
 		}
 
-		var currentGridState = gridCells[currentStateIndex];
+		var currentGridState = _gridCells[_currentStateIndex];
 
 		var color = currentGridState[x, y].Color;
 		
-		DrawRect(new Rect2(x * boxSize, y * boxSize, boxSize, boxSize), color);
+		DrawRect(new Rect2(x * _boxSize, y * _boxSize, _boxSize, _boxSize), color);
 	}	
 
 	public Tuple<int, int> GetRandomCoords()
@@ -92,23 +112,23 @@ public partial class GridManager : Node2D
 
 	public void SaveState()
 	{
-		var currentGridState = gridCells[currentStateIndex];
+		var currentGridState = _gridCells[_currentStateIndex];
 		var newGridState = (Cell[,]) currentGridState.Clone();
-		gridCells.Add(newGridState);
-		currentStateIndex++;
+		_gridCells.Add(newGridState);
+		_currentStateIndex++;
 
 		// Optionally, limit the history to the last 100 states
-		if (gridCells.Count > 100)
+		if (_gridCells.Count > 100)
 		{
-			gridCells.RemoveAt(0);
-			currentStateIndex--;
+			_gridCells.RemoveAt(0);
+			_currentStateIndex--;
 		}
 	}
 	
 	public override void _Draw()
 	{
-		var currentGridState = gridCells[currentStateIndex];
-		GD.Print("Current state index: " + currentStateIndex);
+		var currentGridState = _gridCells[_currentStateIndex];
+		GD.Print("Current state index: " + _currentStateIndex);
 		for (int x = 0; x < gridWidth; x++)
 		{
 			for (int y = 0; y < gridHeight; y++)
@@ -126,16 +146,16 @@ public partial class GridManager : Node2D
 			}
 		}
 
-		if (debug)
+		if (_debugState)
 		{
 			for (int x = 0; x <= gridWidth; x++)
 			{
-				DrawLine(new Vector2(x * boxSize, 0), new Vector2(x * boxSize, gridHeight * boxSize), new Color(0, 0, 0));
+				DrawLine(new Vector2(x * _boxSize, 0), new Vector2(x * _boxSize, gridHeight * _boxSize), new Color(0, 0, 0));
 			}
 
 			for (int y = 0; y <= gridHeight; y++)
 			{
-				DrawLine(new Vector2(0, y * boxSize), new Vector2(gridWidth * boxSize, y * boxSize), new Color(0, 0, 0));
+				DrawLine(new Vector2(0, y * _boxSize), new Vector2(gridWidth * _boxSize, y * _boxSize), new Color(0, 0, 0));
 			}
 		}
 	}
