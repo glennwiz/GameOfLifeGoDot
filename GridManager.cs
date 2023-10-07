@@ -94,21 +94,6 @@ public partial class GridManager : Node2D
 		}
 	}
 	
-	public override void _UnhandledInput(InputEvent @event)
-	{
-		if (@event is InputEventMouseButton mouseButtonEvent)
-		{
-			GD.Print("Mouse button event");
-			if (mouseButtonEvent.Pressed)
-			{
-				var mousePosition = mouseButtonEvent.Position;
-				var x = (int) (mousePosition.X / _boxSize);
-				var y = (int) (mousePosition.Y / _boxSize);
-				ToggleCell(new Vector2(x, y));
-				QueueRedraw();
-			}
-		}
-	}
 	
 	private double _timeElapsed = 0.0;
 
@@ -233,37 +218,74 @@ public partial class GridManager : Node2D
 	
 	public Cell[,] ApplyConwaysRules(Cell[,] currentGrid)
 	{
-		var newGrid = new Cell[gridWidth, gridHeight];
-    
-		// Loop through every cell in current grid
-		for (var x = 0; x < gridWidth; x++)
-		{
-			for (var y = 0; y < gridHeight; y++)
-			{
-				// Count living neighbors
-				var liveNeighbors = CountLiveNeighbors(currentGrid, x, y);
-            
-				// Apply Conway's rules
-				if (currentGrid[x, y]?.IsAlive ?? false)
-				{
-					newGrid[x, y] = new Cell {
-						Color = Colors.Yellow,
-						IsAlive = liveNeighbors == 2 || liveNeighbors == 3,
-						Position = new Vector2(x, y)
-					};
-				}
-				else
-				{
-					newGrid[x, y] = new Cell {
-						Color = Colors.Red,
-						IsAlive = liveNeighbors == 3,
-						Position = new Vector2(x, y)
-					};
-				}
-			}
-		}
-    
-		return newGrid;
+	    var newGrid = new Cell[gridWidth, gridHeight];
+	    
+	    // Loop through every cell in current grid
+	    for (var x = 0; x < gridWidth; x++)
+	    {
+	        for (var y = 0; y < gridHeight; y++)
+	        {
+	            // Count living neighbors
+	            var liveNeighbors = CountLiveNeighbors(currentGrid, x, y);
+	        
+	            Color cellColor;
+	            switch (liveNeighbors)
+	            {
+	                case 0:
+	                    cellColor = Colors.Black;
+	                    break;
+	                case 1:
+	                    cellColor = Colors.Red;
+	                    break;
+	                case 2:
+	                    cellColor = Colors.Yellow;
+	                    break;
+	                case 3:
+	                    cellColor = Colors.Green;
+	                    break;
+	                case 4:
+	                    cellColor = Colors.Cyan;
+	                    break;
+	                case 5:
+	                    cellColor = Colors.Blue;
+	                    break;
+	                case 6:
+	                    cellColor = Colors.Magenta;
+	                    break;
+	                case 7:
+	                    cellColor = Colors.White;
+	                    break;
+	                default:
+	                    cellColor = Colors.Gray;
+	                    break;
+	            }
+	        
+	            // Apply Conway's rules
+	            //1. Any live cell with two or three live neighbours survives.
+	            //2. Any dead cell with three live neighbours becomes a live cell.
+		        //3. All other live cells die in the next generation. Similarly, all other dead cells stay dead.
+	            if (currentGrid[x, y]?.IsAlive ?? false)
+	            {
+	                newGrid[x, y] = new Cell
+	                {
+	                    Color = cellColor,
+	                    IsAlive = liveNeighbors == 2 || liveNeighbors == 3,
+	                    Position = new Vector2(x, y)
+	                };
+	            }
+	            else
+	            {
+	                newGrid[x, y] = new Cell
+	                {
+	                    Color = cellColor,
+	                    IsAlive = liveNeighbors == 3,
+	                    Position = new Vector2(x, y)
+	                };
+	            }
+	        }
+	    }
+	    
+	    return newGrid;
 	}
 
 	public int CountLiveNeighbors(Cell[,] grid, int x, int y)
