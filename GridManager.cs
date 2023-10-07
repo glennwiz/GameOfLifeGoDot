@@ -26,16 +26,14 @@ public partial class GridManager : Node2D
 		gridWidth = (int)viewportSize.X / _boxSize;
 		gridHeight = (int)viewportSize.Y / _boxSize;
 		var initialState = new Cell[gridWidth, gridHeight];
-
-		Color leftColor = new Color(1, 0, 0); // Red
-		Color rightColor = new Color(0, 0, 1); // Blue
-
+		
 		for (int i = 0; i < gridWidth; i++)
 		{
 			for (int j = 0; j < gridHeight; j++)
 			{
 				float t = (float)i / (gridWidth - 1);
-				Color cellColor = LerpColor(leftColor, rightColor, t);
+				Color cellColor = RandomColor();
+					
 				initialState[i, j] = new Cell
 				{
 					Color = cellColor,
@@ -47,14 +45,12 @@ public partial class GridManager : Node2D
 		}
 		_gridCells.Add(initialState);
 	}
-	
-	private Color LerpColor(Color a, Color b, float t)
+
+	private Color RandomColor()
 	{
-		float red = a.R + t * (b.R - a.R);
-		float green = a.G + t * (b.G - a.G);
-		float blue = a.B + t * (b.B - a.B);
-		return new Color(red, green, blue);
+		return new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
 	}
+
 
 	private bool _isMouseDown = false;
 
