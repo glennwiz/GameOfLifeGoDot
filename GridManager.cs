@@ -1,17 +1,20 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Godot.Collections;
 
 public partial class GridManager : Node2D
 {
 	Random rand = new ();
 	private int _boxSize = 10;
+	float updateTickRate = 0.5f;
+	private double _timeElapsed = 0.0;
 	private bool _debugState = true;
 	private int _currentStateIndex = 0; // The index of the current state in the gridStates list we keep track of 100 states
 	private List<Cell[,]> _gridCells = new ();
-	
-	private int gridWidth { get; set;}
-	private int gridHeight { get; set;}
+
+	private int gridWidth;
+	private int gridHeight;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -54,6 +57,25 @@ public partial class GridManager : Node2D
 
 	public override void _Input(InputEvent @event)
 	{
+		if(Input.IsKeyPressed(Key.Up))
+		{
+			updateTickRate -= 0.1f;
+		}
+		if(Input.IsKeyPressed(Key.Down))
+		{
+			updateTickRate += 0.1f;
+		}
+		if(Input.IsKeyPressed(Key.Left))
+		{
+			// create the walker pattern at mouse position
+			
+			
+		}
+		if(Input.IsKeyPressed(Key.Right))
+		{
+			GD.Print("Right");
+		}		
+		
 		if (@event is InputEventMouseButton mouseButtonEvent)
 		{
 			if (mouseButtonEvent.DoubleClick)
@@ -65,7 +87,7 @@ public partial class GridManager : Node2D
 			if (mouseButtonEvent.Pressed)
 			{
 				_isMouseDown = mouseButtonEvent.Pressed;
-				if (_isMouseDown) // If the mouse was pressed, then draw at the initial position
+				if (_isMouseDown)
 				{
 					var mousePosition = mouseButtonEvent.Position;
 					var x = (int) (mousePosition.X / _boxSize);
@@ -94,26 +116,16 @@ public partial class GridManager : Node2D
 		}
 	}
 	
-	
-	private double _timeElapsed = 0.0;
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
 		_timeElapsed += delta;
-		foreach (var cell in _gridCells[_currentStateIndex])
-		{
-			if(_timeElapsed >= 1.5)  
-				cell?.UpdateAlpha(delta);
-		}
-		
-		_timeElapsed += delta;
-		if(_timeElapsed >= 0.3)  
+		if(_timeElapsed >= updateTickRate)  
 		{
 			_gridCells[_currentStateIndex] = ApplyConwaysRules(_gridCells[_currentStateIndex]);
 			_timeElapsed = 0.0;
 		}
-		
 		
 		QueueRedraw();
 	}
