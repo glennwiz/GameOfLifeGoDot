@@ -27,12 +27,12 @@ public partial class GridManager : Node2D
 		gridHeight = (int)viewportSize.Y / _boxSize;
 		var initialState = new Cell[gridWidth, gridHeight];
 		
-		for (int i = 0; i < gridWidth; i++)
+		for (var i = 0; i < gridWidth; i++)
 		{
-			for (int j = 0; j < gridHeight; j++)
+			for (var j = 0; j < gridHeight; j++)
 			{
-				float t = (float)i / (gridWidth - 1);
-				Color cellColor = Colors.Azure;//RandomColor();
+				var t = (float)i / (gridWidth - 1);
+				var cellColor = Colors.Black;
 					
 				initialState[i, j] = new Cell
 				{
@@ -40,7 +40,6 @@ public partial class GridManager : Node2D
 					IsAlive = rand.Next(0, 2) == 1,
 					Position = new Vector2(i, j)
 				};
-				GD.Print("the color is: " + initialState[i, j].Color);
 			}
 		}
 		_gridCells.Add(initialState);
@@ -51,13 +50,18 @@ public partial class GridManager : Node2D
 		return new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
 	}
 
-
 	private bool _isMouseDown = false;
 
 	public override void _Input(InputEvent @event)
 	{
 		if (@event is InputEventMouseButton mouseButtonEvent)
 		{
+			if (mouseButtonEvent.DoubleClick)
+			{
+				_isMouseDown = false;
+				return;
+			}
+
 			if (mouseButtonEvent.Pressed)
 			{
 				_isMouseDown = mouseButtonEvent.Pressed;
@@ -69,12 +73,17 @@ public partial class GridManager : Node2D
 					ToggleCell(new Vector2(x, y));
 					QueueRedraw();
 				}
+				if (!_isMouseDown)
+				{
+					_isMouseDown = false;
+				}
 			}
 		}
 		else if (@event is InputEventMouseMotion mouseMotionEvent)
 		{
 			if (_isMouseDown) // If the mouse button is being held, then draw at the new position
 			{
+				
 				var mousePosition = mouseMotionEvent.Position;
 				var x = (int) (mousePosition.X / _boxSize);
 				var y = (int) (mousePosition.Y / _boxSize);
@@ -191,9 +200,9 @@ public partial class GridManager : Node2D
 	public override void _Draw()
 	{
 		var currentGridState = _gridCells[_currentStateIndex];
-		for (int x = 0; x < gridWidth; x++)
+		for (var x = 0; x < gridWidth; x++)
 		{
-			for (int y = 0; y < gridHeight; y++)
+			for (var y = 0; y < gridHeight; y++)
 			{
 				//Check if there is a cell at this position
 				if (currentGridState[x, y] == null)
@@ -210,12 +219,12 @@ public partial class GridManager : Node2D
 
 		if (_debugState)
 		{
-			for (int x = 0; x <= gridWidth; x++)
+			for (var x = 0; x <= gridWidth; x++)
 			{
 				DrawLine(new Vector2(x * _boxSize, 0), new Vector2(x * _boxSize, gridHeight * _boxSize), new Color(0, 0, 0));
 			}
 
-			for (int y = 0; y <= gridHeight; y++)
+			for (var y = 0; y <= gridHeight; y++)
 			{
 				DrawLine(new Vector2(0, y * _boxSize), new Vector2(gridWidth * _boxSize, y * _boxSize), new Color(0, 0, 0));
 			}
@@ -227,12 +236,12 @@ public partial class GridManager : Node2D
 		var newGrid = new Cell[gridWidth, gridHeight];
     
 		// Loop through every cell in current grid
-		for (int x = 0; x < gridWidth; x++)
+		for (var x = 0; x < gridWidth; x++)
 		{
-			for (int y = 0; y < gridHeight; y++)
+			for (var y = 0; y < gridHeight; y++)
 			{
 				// Count living neighbors
-				int liveNeighbors = CountLiveNeighbors(currentGrid, x, y);
+				var liveNeighbors = CountLiveNeighbors(currentGrid, x, y);
             
 				// Apply Conway's rules
 				if (currentGrid[x, y]?.IsAlive ?? false)
@@ -259,20 +268,20 @@ public partial class GridManager : Node2D
 
 	public int CountLiveNeighbors(Cell[,] grid, int x, int y)
 	{
-		int count = 0;
+		var count = 0;
 
 		// Check all 8 neighbors
 		// (loop through -1 to 1 for x and y, skip 0,0)
-		for (int i = -1; i <= 1; i++)
+		for (var i = -1; i <= 1; i++)
 		{
-			for (int j = -1; j <= 1; j++)
+			for (var j = -1; j <= 1; j++)
 			{
 				// Skip the cell itself
 				if (i == 0 && j == 0)
 					continue;
 
-				int nx = x + i;
-				int ny = y + j;
+				var nx = x + i;
+				var ny = y + j;
 
 				// Check boundaries
 				if (nx >= 0 && nx < grid.GetLength(0) && ny >= 0 && ny < grid.GetLength(1))
