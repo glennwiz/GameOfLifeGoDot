@@ -32,7 +32,7 @@ public partial class GridManager : Node2D
 			for (int j = 0; j < gridHeight; j++)
 			{
 				float t = (float)i / (gridWidth - 1);
-				Color cellColor = RandomColor();
+				Color cellColor = Colors.Azure;//RandomColor();
 					
 				initialState[i, j] = new Cell
 				{
@@ -238,6 +238,7 @@ public partial class GridManager : Node2D
 				if (currentGrid[x, y]?.IsAlive ?? false)
 				{
 					newGrid[x, y] = new Cell {
+						Color = Colors.Yellow,
 						IsAlive = liveNeighbors == 2 || liveNeighbors == 3,
 						Position = new Vector2(x, y)
 					};
@@ -245,7 +246,7 @@ public partial class GridManager : Node2D
 				else
 				{
 					newGrid[x, y] = new Cell {
-						Color = new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()),
+						Color = Colors.Red,
 						IsAlive = liveNeighbors == 3,
 						Position = new Vector2(x, y)
 					};
