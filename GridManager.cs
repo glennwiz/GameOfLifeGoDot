@@ -207,7 +207,7 @@ public partial class GridManager : Node2D
 					continue;
 				}
 				
-				if (currentGridState[x, y].IsAlive)
+				if (true)//currentGridState[x, y].IsAlive)
 				{
 					DrawBox(x, y);
 				}
@@ -239,39 +239,8 @@ public partial class GridManager : Node2D
 	        {
 	            // Count living neighbors
 	            var liveNeighbors = CountLiveNeighbors(currentGrid, x, y);
-	        
-	            Color cellColor;
-	            switch (liveNeighbors)
-	            {
-	                case 0:
-	                    cellColor = Colors.Black;
-	                    break;
-	                case 1:
-	                    cellColor = Colors.Red;
-	                    break;
-	                case 2:
-	                    cellColor = Colors.Yellow;
-	                    break;
-	                case 3:
-	                    cellColor = Colors.Green;
-	                    break;
-	                case 4:
-	                    cellColor = Colors.Cyan;
-	                    break;
-	                case 5:
-	                    cellColor = Colors.Blue;
-	                    break;
-	                case 6:
-	                    cellColor = Colors.Magenta;
-	                    break;
-	                case 7:
-	                    cellColor = Colors.White;
-	                    break;
-	                default:
-	                    cellColor = Colors.Gray;
-	                    break;
-	            }
-	        
+	            var cellColor = GetCellColor(liveNeighbors);
+
 	            // Apply Conway's rules
 	            //1. Any live cell with two or three live neighbours survives.
 	            //2. Any dead cell with three live neighbours becomes a live cell.
@@ -280,6 +249,7 @@ public partial class GridManager : Node2D
 	            {
 	                newGrid[x, y] = new Cell
 	                {
+		                LiveNeighbors = liveNeighbors,
 	                    Color = cellColor,
 	                    IsAlive = liveNeighbors == 2 || liveNeighbors == 3,
 	                    Position = new Vector2(x, y)
@@ -289,6 +259,7 @@ public partial class GridManager : Node2D
 	            {
 	                newGrid[x, y] = new Cell
 	                {
+		                LiveNeighbors = liveNeighbors,
 	                    Color = cellColor,
 	                    IsAlive = liveNeighbors == 3,
 	                    Position = new Vector2(x, y)
@@ -298,6 +269,24 @@ public partial class GridManager : Node2D
 	    }
 	    
 	    return newGrid;
+	}
+
+	private static Color GetCellColor(int liveNeighbors)
+	{
+		System.Collections.Generic.Dictionary<int, Color> colorMap = new()
+		{
+			{0, Colors.Black},
+			{1, Colors.Red},
+			{2, Colors.Yellow},
+			{3, Colors.Green},
+			{4, Colors.Cyan},
+			{5, Colors.Blue},
+			{6, Colors.Magenta},
+			{7, Colors.White},
+		};
+
+		Color cellColor = colorMap.ContainsKey(liveNeighbors) ? colorMap[liveNeighbors] : Colors.Gray;
+		return cellColor;
 	}
 
 	public int CountLiveNeighbors(Cell[,] grid, int x, int y)

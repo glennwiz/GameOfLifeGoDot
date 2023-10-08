@@ -7,7 +7,8 @@ public class Cell
     public Color Color { get; set; }
     public float TargetAlpha { get; set; }
     public float CurrentAlpha { get; set; }
-    
+    public int LiveNeighbors { get; set; }
+
     public void UpdateAlpha(double delta)
     {
         // Interpolate the alpha value towards the target alpha
