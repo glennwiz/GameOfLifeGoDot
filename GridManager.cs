@@ -12,11 +12,13 @@ public partial class GridManager : Node2D
 	private bool _debugState = true;
 	private int _currentStateIndex = 0; // The index of the current state in the gridStates list we keep track of 100 states
 	private List<Cell[,]> _gridCells = new ();
-
+	private bool _isMouseDown = false;
+	
 	private int gridWidth;
 	private int gridHeight;
 
 	public bool drawDeadCell = true;
+
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -55,7 +57,7 @@ public partial class GridManager : Node2D
 		return new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
 	}
 
-	private bool _isMouseDown = false;
+
 
 	public override void _Input(InputEvent @event)
 	{
@@ -67,6 +69,11 @@ public partial class GridManager : Node2D
 			
 			QueueRedraw();
 		}
+
+		if (Input.IsKeyPressed(Key.Q))
+		{
+			drawDeadCell = !drawDeadCell;
+		}
 		
 		if(Input.IsKeyPressed(Key.Up))
 		{
@@ -76,12 +83,41 @@ public partial class GridManager : Node2D
 		{
 			updateTickRate += 0.1f;
 		}
-		if(Input.IsKeyPressed(Key.Left))
+		if(Input.IsKeyPressed(Key.Key1))
 		{
 			// create the walker pattern at mouse position
-			
-			
+			bool[,] gliderCells = new bool[3, 3]
+			{
+				{ false, true, false },
+				{ false, false, true },
+				{ true, true, true }
+			};
+
+			Pattern glider = new Pattern("Glider", 3, 3, gliderCells);
+			DrawPattern(glider);
 		}
+		if(Input.IsKeyPressed(Key.Key2))
+		{
+			// create a Gosper's glider gun at mouse position
+			bool[,] gosperCells = new bool[11, 38]
+			{
+			    { false, false, false, false, false, false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			    { false, false, false, false, false, false, false, false, false, false, true,  false, false, true,  false, false, false, false, false, true,  true,  false, false, true,  true,  false, false, false, false, false, false, false, false, false, true,  false, false, false },
+			    { false, false, false, false, false, false, false, false, false, true,  false, false, false, false, true,  false, false, false, false, true,  true,  false, false, false, false, false, true,  false, false, false, false, false, false, false, false, true,  true,  false },
+			    { false, false, false, false, false, false, false, false, true,  false, false, false, false, false, true,  false, false, false, false, true,  true,  false, false, false, false, false, true,  false, true,  true,  false, false, false, false, false, false, true,  true },
+			    { true,  true,  false, false, false, false, false, false, true,  false, false, false, true,  true,  false, false, false, false, false, false, false, false, false, false, false, false, true,  false, true,  true,  false, false, false, false, false, false, false, false },
+			    { true,  true,  false, false, false, false, false, false, true,  false, false, false, true,  true,  false, false, false, false, false, true,  true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			    { false, false, false, false, false, false, false, false, true,  false, false, false, false, false, true,  false, false, false, false, true,  true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			    { false, false, false, false, false, false, false, false, false, true,  false, false, false, false, true,  false, false, false, false, false, false, false, false, true,  true,  false, false, false, false, false, false, false, false, false, false, false, false, false },
+			    { false, false, false, false, false, false, false, false, false, false, true,  false, false, true,  false, false, false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			    { false, false, false, false, false, false, false, false, false, false, false, false, true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			    { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+			};
+			
+			Pattern gosperGliderGun = new Pattern("Gosper's Glider Gun", 11, 38, gosperCells);
+			DrawPattern(gosperGliderGun);
+		}
+		
 		if(Input.IsKeyPressed(Key.Right))
 		{
 			GD.Print("Right");
@@ -123,6 +159,36 @@ public partial class GridManager : Node2D
 
 				ToggleCell(new Vector2(x, y));
 				QueueRedraw();
+			}
+		}
+	}
+
+	private void DrawPattern(Pattern glider)
+	{
+		var currentGridState = _gridCells[_currentStateIndex];
+		var patternWidth = glider.Width;
+		var patternHeight = glider.Height;
+		var patternCells = glider.Cells;
+		var mousePosition = GetGlobalMousePosition();
+		var x = (int) (mousePosition.X / _boxSize);
+		var y = (int) (mousePosition.Y / _boxSize);
+		
+		for (var i = 0; i < patternWidth; i++)
+		{
+			for (var j = 0; j < patternHeight; j++)
+			{
+				var cellColor = Colors.Black;
+				if (patternCells[i, j])
+				{
+					cellColor = Colors.White;
+				}
+				
+				currentGridState[x + i, y + j] = new Cell
+				{
+					Color = cellColor,
+					IsAlive = patternCells[i, j],
+					Position = new Vector2(x + i, y + j)
+				};
 			}
 		}
 	}
@@ -354,5 +420,20 @@ public partial class GridManager : Node2D
 	{
 		updateTickRate = DefaultUpdateTickRate;
 	}
+	
+	public class Pattern
+	{
+		public string Name { get; set; } // Name of the pattern
+		public int Width { get; set; } // Width of the pattern grid
+		public int Height { get; set; } // Height of the pattern grid
+		public bool[,] Cells { get; set; } // 2D array representing the pattern's initial state
 
+		public Pattern(string name, int width, int height, bool[,] cells)
+		{
+			Name = name;
+			Width = width;
+			Height = height;
+			Cells = cells;
+		}
+	}
 }
