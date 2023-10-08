@@ -12,7 +12,8 @@ public partial class GridManager : Node2D
 	private bool _debugState = true;
 	private int _currentStateIndex = 0; // The index of the current state in the gridStates list we keep track of 100 states
 	private List<Cell[,]> _gridCells = new ();
-	private bool _isMouseDown = false;
+	private bool _isMouseDown = false;	
+	private bool _isPaused = false;
 	
 	private int gridWidth;
 	private int gridHeight;
@@ -56,11 +57,30 @@ public partial class GridManager : Node2D
 	{
 		return new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
 	}
+	
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _Process(double delta)
+	{
+		if (_isPaused) return;
+		
+		_timeElapsed += delta;
+		if (_timeElapsed >= updateTickRate)
+		{
+			_gridCells[_currentStateIndex] = ApplyConwaysRules(_gridCells[_currentStateIndex]);
+			_timeElapsed = 0.0;
+		}
 
-
+		QueueRedraw();
+	}
 
 	public override void _Input(InputEvent @event)
 	{
+		
+		if (Input.IsKeyPressed(Key.Space))
+		{
+			_isPaused = !_isPaused;
+		}
+		
 		// Handle 'S' key press to clear cells and reset speed
 		if (Input.IsKeyPressed(Key.S))
 		{
@@ -83,6 +103,46 @@ public partial class GridManager : Node2D
 		{
 			updateTickRate += 0.1f;
 		}
+		
+		// Handle mouse input to toggle cells
+		if (@event is InputEventMouseButton mouseButtonEvent)
+		{
+			if (mouseButtonEvent.DoubleClick)
+			{
+				_isMouseDown = false;
+				return;
+			}
+
+			if (mouseButtonEvent.Pressed)
+			{
+				_isMouseDown = mouseButtonEvent.Pressed;
+				if (_isMouseDown)
+				{
+					var mousePosition = mouseButtonEvent.Position;
+					var x = (int)(mousePosition.X / _boxSize);
+					var y = (int)(mousePosition.Y / _boxSize);
+					ToggleCell(new Vector2(x, y));
+					QueueRedraw();
+				}
+				if (!_isMouseDown)
+				{
+					_isMouseDown = false;
+				}
+			}
+		}
+		else if (@event is InputEventMouseMotion mouseMotionEvent)
+		{
+			if (_isMouseDown)
+			{
+				var mousePosition = mouseMotionEvent.Position;
+				var x = (int)(mousePosition.X / _boxSize);
+				var y = (int)(mousePosition.Y / _boxSize);
+
+				ToggleCell(new Vector2(x, y));
+				QueueRedraw();
+			}
+		}
+		
 		if(Input.IsKeyPressed(Key.Key1))
 		{
 			// create the walker pattern at mouse position
@@ -123,7 +183,7 @@ public partial class GridManager : Node2D
 			GD.Print("Right");
 		}		
 		
-		if (@event is InputEventMouseButton mouseButtonEvent)
+		/*if (@event is InputEventMouseButton mouseButtonEvent)
 		{
 			if (mouseButtonEvent.DoubleClick)
 			{
@@ -160,7 +220,7 @@ public partial class GridManager : Node2D
 				ToggleCell(new Vector2(x, y));
 				QueueRedraw();
 			}
-		}
+		}*/
 	}
 
 	private void DrawPattern(Pattern glider)
@@ -191,19 +251,6 @@ public partial class GridManager : Node2D
 				};
 			}
 		}
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-		_timeElapsed += delta;
-		if(_timeElapsed >= updateTickRate)  
-		{
-			_gridCells[_currentStateIndex] = ApplyConwaysRules(_gridCells[_currentStateIndex]);
-			_timeElapsed = 0.0;
-		}
-		
-		QueueRedraw();
 	}
 
 	public void ToggleCell(Vector2 cellCoords)
@@ -306,8 +353,6 @@ public partial class GridManager : Node2D
 			}
 		}
 	}
-
-
 
 	public Cell[,] ApplyConwaysRules(Cell[,] currentGrid)
 	{
