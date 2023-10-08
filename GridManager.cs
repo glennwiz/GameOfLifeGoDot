@@ -15,6 +15,8 @@ public partial class GridManager : Node2D
 
 	private int gridWidth;
 	private int gridHeight;
+
+	public bool drawDeadCell = true;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -206,10 +208,20 @@ public partial class GridManager : Node2D
 				{
 					continue;
 				}
-				
-				if (true)//currentGridState[x, y].IsAlive)
+
+				if (drawDeadCell)
 				{
-					DrawBox(x, y);
+					if (true)
+					{
+						DrawBox(x, y);
+					}
+				}
+				else
+				{
+					if (currentGridState[x, y].IsAlive)
+					{
+						DrawBox(x, y);
+					}
 				}
 			}
 		}
@@ -227,48 +239,44 @@ public partial class GridManager : Node2D
 			}
 		}
 	}
-	
+
+
+
 	public Cell[,] ApplyConwaysRules(Cell[,] currentGrid)
 	{
-	    var newGrid = new Cell[gridWidth, gridHeight];
-	    
-	    // Loop through every cell in current grid
-	    for (var x = 0; x < gridWidth; x++)
-	    {
-	        for (var y = 0; y < gridHeight; y++)
-	        {
-	            // Count living neighbors
-	            var liveNeighbors = CountLiveNeighbors(currentGrid, x, y);
-	            var cellColor = GetCellColor(liveNeighbors);
+		var newGrid = new Cell[gridWidth, gridHeight];
 
-	            // Apply Conway's rules
-	            //1. Any live cell with two or three live neighbours survives.
-	            //2. Any dead cell with three live neighbours becomes a live cell.
-		        //3. All other live cells die in the next generation. Similarly, all other dead cells stay dead.
-	            if (currentGrid[x, y]?.IsAlive ?? false)
-	            {
-	                newGrid[x, y] = new Cell
-	                {
-		                LiveNeighbors = liveNeighbors,
-	                    Color = cellColor,
-	                    IsAlive = liveNeighbors == 2 || liveNeighbors == 3,
-	                    Position = new Vector2(x, y)
-	                };
-	            }
-	            else
-	            {
-	                newGrid[x, y] = new Cell
-	                {
-		                LiveNeighbors = liveNeighbors,
-	                    Color = cellColor,
-	                    IsAlive = liveNeighbors == 3,
-	                    Position = new Vector2(x, y)
-	                };
-	            }
-	        }
-	    }
-	    
-	    return newGrid;
+		for (var x = 0; x < gridWidth; x++)
+		{
+			for (var y = 0; y < gridHeight; y++)
+			{
+				var liveNeighbors = CountLiveNeighbors(currentGrid, x, y);
+				var cellColor = GetCellColor(liveNeighbors);
+
+				if (currentGrid[x, y]?.IsAlive ?? false)
+				{
+					newGrid[x, y] = new Cell
+					{
+						LiveNeighbors = liveNeighbors,
+						Color = cellColor,
+						IsAlive = liveNeighbors == 2 || liveNeighbors == 3,
+						Position = new Vector2(x, y)
+					};
+				}
+				else
+				{
+					newGrid[x, y] = new Cell
+					{
+						LiveNeighbors = liveNeighbors,
+						Color = cellColor,
+						IsAlive = liveNeighbors == 3,
+						Position = new Vector2(x, y)
+					};
+				}
+			}
+		}
+
+		return newGrid;
 	}
 
 	private static Color GetCellColor(int liveNeighbors)
@@ -285,34 +293,38 @@ public partial class GridManager : Node2D
 			{7, Colors.White},
 		};
 
-		Color cellColor = colorMap.ContainsKey(liveNeighbors) ? colorMap[liveNeighbors] : Colors.Gray;
+		var cellColor = colorMap.ContainsKey(liveNeighbors) ? colorMap[liveNeighbors] : Colors.Gray;
 		return cellColor;
 	}
 
 	public int CountLiveNeighbors(Cell[,] grid, int x, int y)
 	{
 		var count = 0;
+		var width = grid.GetLength(0);
+		var height = grid.GetLength(1);
 
-		// Check all 8 neighbors
-		// (loop through -1 to 1 for x and y, skip 0,0)
-		for (var i = -1; i <= 1; i++)
+		// Define offsets for all 8 neighbors
+		int[] xOffset = { -1, 0, 1, -1, 1, -1, 0, 1 };
+		int[] yOffset = { -1, -1, -1, 0, 0, 1, 1, 1 };
+
+		for (int i = 0; i < 8; i++)
 		{
-			for (var j = -1; j <= 1; j++)
-			{
-				// Skip the cell itself
-				if (i == 0 && j == 0)
-					continue;
+			int nx = x + xOffset[i];
+			int ny = y + yOffset[i];
 
-				var nx = x + i;
-				var ny = y + j;
+			// Wrap around edges
+			if (nx < 0)
+				nx = width - 1;
+			else if (nx >= width)
+				nx = 0;
 
-				// Check boundaries
-				if (nx >= 0 && nx < grid.GetLength(0) && ny >= 0 && ny < grid.GetLength(1))
-				{
-					if (grid[nx, ny].IsAlive)
-						count++;
-				}
-			}
+			if (ny < 0)
+				ny = height - 1;
+			else if (ny >= height)
+				ny = 0;
+
+			if (grid[nx, ny].IsAlive)
+				count++;
 		}
 
 		return count;
