@@ -59,6 +59,15 @@ public partial class GridManager : Node2D
 
 	public override void _Input(InputEvent @event)
 	{
+		// Handle 'S' key press to clear cells and reset speed
+		if (Input.IsKeyPressed(Key.S))
+		{
+			ClearGrid();
+			ResetUpdateTickRate();
+			
+			QueueRedraw();
+		}
+		
 		if(Input.IsKeyPressed(Key.Up))
 		{
 			updateTickRate -= 0.1f;
@@ -117,7 +126,6 @@ public partial class GridManager : Node2D
 			}
 		}
 	}
-	
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
@@ -173,14 +181,7 @@ public partial class GridManager : Node2D
 		
 		DrawRect(new Rect2(x * _boxSize, y * _boxSize, _boxSize, _boxSize), color);
 	}	
-
-	public Tuple<int, int> GetRandomCoords()
-	{
-		var randomX = new Random().Next(0, gridWidth);
-		var randomY = new Random().Next(0, gridHeight);
-		return Tuple.Create(randomX, randomY);
-	}
-
+	
 	public void SaveState()
 	{
 		var currentGridState = _gridCells[_currentStateIndex];
@@ -329,4 +330,29 @@ public partial class GridManager : Node2D
 
 		return count;
 	}
+	
+	// Default speed value
+	private const float DefaultUpdateTickRate = 0.5f;
+	private void ClearGrid()
+	{
+		// Clear all cells
+		for (int x = 0; x < gridWidth; x++)
+		{
+			for (int y = 0; y < gridHeight; y++)
+			{
+				_gridCells[_currentStateIndex][x, y] = new Cell
+				{
+					Color = Colors.Black,
+					IsAlive = false,
+					Position = new Vector2(x, y)
+				};
+			}
+		}
+	}
+	
+	public void ResetUpdateTickRate()
+	{
+		updateTickRate = DefaultUpdateTickRate;
+	}
+
 }
