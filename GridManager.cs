@@ -1,25 +1,27 @@
-using Godot;
 using System;
 using System.Collections.Generic;
-using Godot.Collections;
+using System.Diagnostics.CodeAnalysis;
+using Godot;
+
+namespace GameOfLife;
 
 public partial class GridManager : Node2D
 {
-	Random rand = new ();
+	private readonly Random _random = new ();
 	private int _boxSize = 10;
-	float _updateTickRate = 0.5f;
-	private double _timeElapsed = 0.0;
+	private float _updateTickRate = 0.5f;
+	private double _timeElapsed;
 	private bool _debugState = true;
-	private int _currentStateIndex = 0; // The index of the current state in the gridStates list we keep track of 100 states
-	private List<Cell[,]> _gridCells = new ();
-	private bool _isMouseDown = false;	
-	private bool _isPaused = false;
+	private int _currentStateIndex; 
+	private readonly List<Cell[,]> _gridCells = new ();
+	private bool _isMouseDown;	
+	private bool _isPaused;
 	
-	private int gridWidth;
-	private int gridHeight;
+	private int _gridWidth;
+	private int _gridHeight;
 
-	private bool drawDeadCell = true;
-	private Color newAliveColor = Colors.Yellow;
+	private bool _drawDeadCell = true;
+	private Color _newAliveColor = Colors.Yellow;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -31,21 +33,20 @@ public partial class GridManager : Node2D
 	private void InitGrid()
 	{
 		var viewportSize = GetViewportRect().Size;
-		gridWidth = (int)viewportSize.X / _boxSize;
-		gridHeight = (int)viewportSize.Y / _boxSize;
-		var initialState = new Cell[gridWidth, gridHeight];
+		_gridWidth = (int)viewportSize.X / _boxSize;
+		_gridHeight = (int)viewportSize.Y / _boxSize;
+		var initialState = new Cell[_gridWidth, _gridHeight];
 		
-		for (var i = 0; i < gridWidth; i++)
+		for (var i = 0; i < _gridWidth; i++)
 		{
-			for (var j = 0; j < gridHeight; j++)
+			for (var j = 0; j < _gridHeight; j++)
 			{
-				var t = (float)i / (gridWidth - 1);
 				var cellColor = Colors.Black;
 					
 				initialState[i, j] = new Cell
 				{
 					Color = cellColor,
-					IsAlive = rand.Next(0, 2) == 1,
+					IsAlive = _random.Next(0, 2) == 1,
 					Position = new Vector2(i, j)
 				};
 			}
@@ -55,7 +56,7 @@ public partial class GridManager : Node2D
 
 	private Color RandomColor()
 	{
-		return new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble());
+		return new Color((float)_random.NextDouble(), (float)_random.NextDouble(), (float)_random.NextDouble());
 	}
 	
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -73,6 +74,7 @@ public partial class GridManager : Node2D
 		QueueRedraw();
 	}
 
+	[SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
 	public override void _Input(InputEvent @event)
 	{
 
@@ -92,7 +94,7 @@ public partial class GridManager : Node2D
 
 		if (Input.IsKeyPressed(Key.Q))
 		{
-			drawDeadCell = !drawDeadCell;
+			_drawDeadCell = !_drawDeadCell;
 		}
 
 		if (Input.IsKeyPressed(Key.Up))
@@ -122,7 +124,7 @@ public partial class GridManager : Node2D
 					var mousePosition = mouseButtonEvent.Position;
 					var x = (int) (mousePosition.X / _boxSize);
 					var y = (int) (mousePosition.Y / _boxSize);
-					ToggleCell(new Vector2(x, y), Colors.Yellow);
+					ToggleCell(new Vector2(x, y));
 					QueueRedraw();
 				}
 
@@ -133,51 +135,53 @@ public partial class GridManager : Node2D
 			}
 		}
 		/*else if (@event is InputEventMouseMotion mouseMotionEvent)
+	{
+		if (_isMouseDown)
 		{
-			if (_isMouseDown)
-			{
-				var mousePosition = mouseMotionEvent.Position;
-				var x = (int) (mousePosition.X / _boxSize);
-				var y = (int) (mousePosition.Y / _boxSize);
+			var mousePosition = mouseMotionEvent.Position;
+			var x = (int) (mousePosition.X / _boxSize);
+			var y = (int) (mousePosition.Y / _boxSize);
 
-				ToggleCell(new Vector2(x, y));
-				QueueRedraw();
-			}
-		}*/
+			ToggleCell(new Vector2(x, y));
+			QueueRedraw();
+		}
+	}*/
 
 		if (Input.IsKeyPressed(Key.Key1))
 		{
 			// create the walker pattern at mouse position
-			bool[,] gliderCells = new bool[3, 3]
+			var gliderCells = new[,]
 			{
 				{false, true , false},
 				{false, false, true},
 				{true , true , true}
 			};
 
-			Pattern glider = new Pattern("Glider", 3, 3, gliderCells);
+			var glider = new Pattern(3, 3, gliderCells);
 			DrawPattern(glider);
 		}
 
 		if (Input.IsKeyPressed(Key.Key2))
 		{
-			bool F = false;
-			bool T = true;
+			const bool f = false; //too easier read the pattern in the grid
+		
 			// create a Gosper's glider gun at mouse position
-			bool[,] gosperCells =  new bool[9, 37]
+			var gosperCells =  new[,]
 			{
-				{F 	  , F   , F , F	, F	, F	, F	, F , F , F , F   , F   , F   , F   , F   , F   , F   , F    , F , F , F   , F   , F   , F , true, F  , F	, F	, F	, F	, F	, F , F , F , F , F , F},
-				{F 	  , F   , F , F	, F	, F	, F	, F , F , F , F   , F   , F   , F   , F   , F   , F   , F    , F , F , F   , F   , true, F , true, F  , F	, F	, F	, F	, F	, F , F , F , F , F , F},
-				{F 	  , F   , F , F	, F	, F	, F	, F , F , F , F   , F   , true, true, F   , F   , F   , F    , F , F , true, true, F   , F , F   , F  , F	, F	, F	, F	, F	, F , F , F , F , F , F},
-				{F 	  , F   , F , F	, F	, F	, F	, F , F , F , F   , true, F   , F   , F   , true, F   , F    , F , F , true, true, F   , F , F   , F  , F	, F	, F	, F	, F	, F , F , F , true, true, F},
-				{true , true, F , F	, F	, F	, F	, F , F , F , true, F   , F   , F   , F   , F   , true, F    , F , F , true, true, F   , F , F   , F  , F	, F	, F	, F	, F	, F , F , F , true, true, F},
-				{true , true, F , F	, F	, F	, F	, F , F , F , true, F   , F   , F   , true, F   , true, true , F , F , F   , F   , true, F , true, F  , F	, F	, F	, F	, F	, F , F , F , F , F , F},
-				{F    , F 	, F , F	, F	, F	, F	, F , F , F , true, F   , F   , F   , F   , F   , true, F    , F , F , F   , F   , F   , F , true, F  , F	, F	, F	, F	, F	, F , F , F , F , F , F},
-				{F    , F 	, F , F	, F	, F	, F	, F , F , F , F   , true, F   , F   , F   , true, F   , F    , F , F , F   , F   , F   , F , F   , F  , F	, F	, F	, F	, F	, F , F , F , F , F , F},
-				{F    , F 	, F , F	, F	, F	, F	, F , F , F , F   , F   , true, true, F   , F   , F   , F    , F , F , F   , F   , F   , F , F   , F  , F	, F	, F	, F	, F	, F , F , F , F , F , F}
-			};     
- 
-			Pattern gosperGliderGun = new Pattern("Gosper's Glider Gun", 9, 37, gosperCells);
+				{f 	  , f   , f , f	, f	, f	, f	, f , f , f , f   , f   , f   , f   , f   , f   , f   , f    , f , f , f   , f   , f   , f , true, f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
+				{f 	  , f   , f , f	, f	, f	, f	, f , f , f , f   , f   , f   , f   , f   , f   , f   , f    , f , f , f   , f   , true, f , true, f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
+				{f 	  , f   , f , f	, f	, f	, f	, f , f , f , f   , f   , true, true, f   , f   , f   , f    , f , f , true, true, f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
+				{f 	  , f   , f , f	, f	, f	, f	, f , f , f , f   , true, f   , f   , f   , true, f   , f    , f , f , true, true, f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , true, true },
+				{true , true, f , f	, f	, f	, f	, f , f , f , true, f   , f   , f   , f   , f   , true, f    , f , f , true, true, f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , true, true },
+				{true , true, f , f	, f	, f	, f	, f , f , f , true, f   , f   , f   , true, f   , true, true , f , f , f   , f   , true, f , true, f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
+				{f    , f 	, f , f	, f	, f	, f	, f , f , f , true, f   , f   , f   , f   , f   , true, f    , f , f , f   , f   , f   , f , true, f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
+				{f    , f 	, f , f	, f	, f	, f	, f , f , f , f   , true, f   , f   , f   , true, f   , f    , f , f , f   , f   , f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
+				{f    , f 	, f , f	, f	, f	, f	, f , f , f , f   , f   , true, true, f   , f   , f   , f    , f , f , f   , f   , f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , f   , f    }
+			};
+
+			var rotated = RotateMatrix90(gosperCells);
+			
+			var gosperGliderGun = new Pattern(36, 9, rotated);
 			DrawPattern(gosperGliderGun);
 		}
 
@@ -186,6 +190,9 @@ public partial class GridManager : Node2D
 			GD.Print("Right");
 		}
 	}
+	
+
+
 
 	private void DrawPattern(Pattern pattern)
 	{
@@ -201,7 +208,7 @@ public partial class GridManager : Node2D
 		{
 			for (var j = 0; j < patternHeight; j++)
 			{
-				//idnex out of bounda check, print and return
+				//index out of bounds check, print and return
 				try
 				{
 					var cellColor = Colors.Black;
@@ -217,24 +224,21 @@ public partial class GridManager : Node2D
 						Position = new Vector2(mousePositionX + i, mousePositionY + j)
 					};
 				}
-				catch (System.IndexOutOfRangeException e)
+				catch (IndexOutOfRangeException e)
 				{
-					GD.Print("i = " + i + " | " + "j = " + j); ;
+					GD.Print("i = " + i + " | " + "j = " + j);
 					Console.WriteLine(e);
-					//throw;
 				}
-				
-				
 			}
 		}
 	}
 
-	public void ToggleCell(Vector2 cellCoords, Color? color = null)
+	private void ToggleCell(Vector2 cellCoords)
 	{
 		var x = (int) cellCoords.X;
 		var y = (int) cellCoords.Y;
 
-		if (x < 0 || x >= gridWidth || y < 0 || y >= gridHeight)
+		if (x < 0 || x >= _gridWidth || y < 0 || y >= _gridHeight)
 		{
 			GD.PrintErr("Coordinates out of bounds");
 			return;
@@ -258,7 +262,7 @@ public partial class GridManager : Node2D
 
 	private void DrawBox(int x, int y, Color color)
 	{
-		if (x < 0 || x >= gridWidth || y < 0 || y >= gridHeight)
+		if (x < 0 || x >= _gridWidth || y < 0 || y >= _gridHeight)
 		{
 			GD.PrintErr("Coordinates out of bounds");
 			return;
@@ -266,8 +270,8 @@ public partial class GridManager : Node2D
 
 		DrawRect(new Rect2(x * _boxSize, y * _boxSize, _boxSize, _boxSize), color);
 	}
-	
-	public void SaveState()
+
+	private void SaveState()
 	{
 		var currentGridState = _gridCells[_currentStateIndex];
 		var newGridState = (Cell[,]) currentGridState.Clone();
@@ -289,9 +293,9 @@ public partial class GridManager : Node2D
 		{
 			var currentGridState = _gridCells[_currentStateIndex];
         
-			for (var x = 0; x < gridWidth; x++)
+			for (var x = 0; x < _gridWidth; x++)
 			{
-				for (var y = 0; y < gridHeight; y++)
+				for (var y = 0; y < _gridHeight; y++)
 				{
 					// Check if there is a cell at this position
 					if (currentGridState[x, y] == null)
@@ -299,7 +303,7 @@ public partial class GridManager : Node2D
 						continue;
 					}
 
-					if (drawDeadCell)
+					if (_drawDeadCell)
 					{
 						// Use the cell's color when drawing
 						DrawBox(x, y, currentGridState[x, y].Color);
@@ -318,26 +322,26 @@ public partial class GridManager : Node2D
 
 		if (_debugState)
 		{
-			for (var x = 0; x <= gridWidth; x++)
+			for (var x = 0; x <= _gridWidth; x++)
 			{
-				DrawLine(new Vector2(x * _boxSize, 0), new Vector2(x * _boxSize, gridHeight * _boxSize), new Color(0, 0, 0));
+				DrawLine(new Vector2(x * _boxSize, 0), new Vector2(x * _boxSize, _gridHeight * _boxSize), new Color(0, 0, 0));
 			}
 
-			for (var y = 0; y <= gridHeight; y++)
+			for (var y = 0; y <= _gridHeight; y++)
 			{
-				DrawLine(new Vector2(0, y * _boxSize), new Vector2(gridWidth * _boxSize, y * _boxSize), new Color(0, 0, 0));
+				DrawLine(new Vector2(0, y * _boxSize), new Vector2(_gridWidth * _boxSize, y * _boxSize), new Color(0, 0, 0));
 			}
 		}
 	}
 
 
-	public Cell[,] ApplyConwaysRules(Cell[,] currentGrid)
+	private Cell[,] ApplyConwaysRules(Cell[,] currentGrid)
 	{
-		var newGrid = new Cell[gridWidth, gridHeight];
+		var newGrid = new Cell[_gridWidth, _gridHeight];
 
-		for (var x = 0; x < gridWidth; x++)
+		for (var x = 0; x < _gridWidth; x++)
 		{
-			for (var y = 0; y < gridHeight; y++)
+			for (var y = 0; y < _gridHeight; y++)
 			{
 				var liveNeighbors = CountLiveNeighbors(currentGrid, x, y);
 				var cellColor = GetCellColor(liveNeighbors);
@@ -370,7 +374,7 @@ public partial class GridManager : Node2D
 
 	private static Color GetCellColor(int liveNeighbors)
 	{
-		System.Collections.Generic.Dictionary<int, Color> colorMap = new()
+		Dictionary<int, Color> colorMap = new()
 		{
 			{0, Colors.Black},
 			{1, Colors.Red},
@@ -396,10 +400,10 @@ public partial class GridManager : Node2D
 		int[] xOffset = { -1, 0, 1, -1, 1, -1, 0, 1 };
 		int[] yOffset = { -1, -1, -1, 0, 0, 1, 1, 1 };
 
-		for (int i = 0; i < 8; i++)
+		for (var i = 0; i < 8; i++)
 		{
-			int nx = x + xOffset[i];
-			int ny = y + yOffset[i];
+			var nx = x + xOffset[i];
+			var ny = y + yOffset[i];
 
 			// Wrap around edges
 			if (nx < 0)
@@ -424,9 +428,9 @@ public partial class GridManager : Node2D
 	private void ClearGrid()
 	{
 		// Clear all cells
-		for (int x = 0; x < gridWidth; x++)
+		for (var x = 0; x < _gridWidth; x++)
 		{
-			for (int y = 0; y < gridHeight; y++)
+			for (var y = 0; y < _gridHeight; y++)
 			{
 				_gridCells[_currentStateIndex][x, y] = new Cell
 				{
@@ -438,6 +442,23 @@ public partial class GridManager : Node2D
 		}
 	}
 	
+	public static bool[,] RotateMatrix90(bool[,] matrix)
+	{
+		var height = matrix.GetLength(0);
+		var width = matrix.GetLength(1);
+		var rotated = new bool[width, height];
+
+		for (var i = 0; i < height; i++)
+		{
+			for (var j = 0; j < width; j++)
+			{
+				rotated[j, height - 1 - i] = matrix[i, j];
+			}
+		}
+
+		return rotated;
+	}
+	
 	public void ResetUpdateTickRate()
 	{
 		_updateTickRate = DefaultUpdateTickRate;
@@ -445,14 +466,12 @@ public partial class GridManager : Node2D
 	
 	public class Pattern
 	{
-		public string Name { get; set; } // Name of the pattern
-		public int Width { get; set; } // Width of the pattern grid
-		public int Height { get; set; } // Height of the pattern grid
-		public bool[,] Cells { get; set; } // 2D array representing the pattern's initial state
+		public int Width { get; } // Width of the pattern grid
+		public int Height { get; } // Height of the pattern grid
+		public bool[,] Cells { get; } // 2D array representing the pattern's initial state
 
-		public Pattern(string name, int width, int height, bool[,] cells)
+		public Pattern(int width, int height, bool[,] cells)
 		{
-			Name = name;
 			Width = width;
 			Height = height;
 			Cells = cells;
