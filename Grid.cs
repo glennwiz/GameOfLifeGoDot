@@ -4,27 +4,56 @@ using Godot;
 
 namespace GameOfLife;
 
-public class Grid: Node2D
+public partial class Grid: Node2D
 {
+    public static bool _debugState = true;
+    public bool _isMouseDown;	
+ 
+    public bool _drawDeadCell = true;
+    public Color _newAliveColor = Colors.Yellow;
+
+    private readonly Random _random = new ();
     private int _boxSize = 10;
-    private int _gridWidth;
-    private int _gridHeight;
+ 
+
+    public readonly List<Cell[,]> _gridCells = new ();
     
-    private readonly List<Cell[,]> _gridCells = new ();
+    public int _currentStateIndex;
+    public MatrixManipulation _matrixManipulation = null;
+
+    public int GridWidth { get; set; }
+    public int GridHeight { get; set; }
     
-    private int _currentStateIndex; 
-    private MatrixManipulation _matrixManipulation = null;
+    public bool IsPaused { get; set; }
+    public double TimeElapsed { get; set; }
+    public float UpdateTickRate { get; set; }
+    public List<Cell[,]> GridCells { get; }
+    public int BoxSize { get; set; }
+    public bool DebugState { get; set; }
+
+    // Default speed value
+    private const float DefaultUpdateTickRate = 0.5f;
+	
+    public void ResetUpdateTickRate()
+    {
+        UpdateTickRate = DefaultUpdateTickRate;
+    }
+
+    public Grid()
+    {
+        _matrixManipulation = new MatrixManipulation();
+    }
     
     private void InitGrid()
     {
         var viewportSize = GetViewportRect().Size;
-        _gridWidth = (int)viewportSize.X / _boxSize;
-        _gridHeight = (int)viewportSize.Y / _boxSize;
-        var initialState = new Cell[_gridWidth, _gridHeight];
+        GridWidth = (int)viewportSize.X / _boxSize;
+        GridHeight = (int)viewportSize.Y / _boxSize;
+        var initialState = new Cell[GridWidth, GridHeight];
 		
-        for (var i = 0; i < _gridWidth; i++)
+        for (var i = 0; i < GridWidth; i++)
         {
-            for (var j = 0; j < _gridHeight; j++)
+            for (var j = 0; j < GridHeight; j++)
             {
                 var cellColor = Colors.Black;
 					
@@ -37,43 +66,6 @@ public class Grid: Node2D
             }
         }
         _gridCells.Add(initialState);
-    }
-    
-    private Cell[,] ApplyConwaysRules(Cell[,] currentGrid)
-    {
-        var newGrid = new Cell[_gridWidth, _gridHeight];
-
-        for (var x = 0; x < _gridWidth; x++)
-        {
-            for (var y = 0; y < _gridHeight; y++)
-            {
-                var liveNeighbors = CountLiveNeighbors(currentGrid, x, y);
-                var cellColor = GetCellColor(liveNeighbors);
-
-                if (currentGrid[x, y]?.IsAlive ?? false)
-                {
-                    newGrid[x, y] = new Cell
-                    {
-                        LiveNeighbors = liveNeighbors,
-                        Color = cellColor,
-                        IsAlive = liveNeighbors == 2 || liveNeighbors == 3,
-                        Position = new Vector2(x, y)
-                    };
-                }
-                else
-                {
-                    newGrid[x, y] = new Cell
-                    {
-                        LiveNeighbors = liveNeighbors,
-                        Color = cellColor,
-                        IsAlive = liveNeighbors == 3,
-                        Position = new Vector2(x, y)
-                    };
-                }
-            }
-        }
-
-        return newGrid;
     }
     
     public int CountLiveNeighbors(Cell[,] grid, int x, int y)
@@ -108,8 +100,8 @@ public class Grid: Node2D
 
         return count;
     }
-    
-    private void StepForward()
+
+    public void StepForward()
     {
         _currentStateIndex++;
 		
@@ -121,7 +113,7 @@ public class Grid: Node2D
         QueueRedraw();
     }
 
-    private void Rewind()
+    public void Rewind()
     {
         _currentStateIndex--;
 		
@@ -132,8 +124,12 @@ public class Grid: Node2D
         //trigger redraw
         QueueRedraw();
     }
-    
-    private void DrawPattern(GridManager.Pattern pattern)
+    private Color RandomColor()
+    {
+        return new Color((float)_random.NextDouble(), (float)_random.NextDouble(), (float)_random.NextDouble());
+    }
+
+    public void DrawPattern(PatternCreator.Pattern pattern)
     {
         var currentGridState = _gridCells[_currentStateIndex];
         var patternWidth = pattern.Width;
@@ -171,15 +167,13 @@ public class Grid: Node2D
             }
         }
     }
-    
 
-
-    private void ToggleCell(Vector2 cellCoords)
+    public void ToggleCell(Vector2 cellCoords)
     {
         var x = (int) cellCoords.X;
         var y = (int) cellCoords.Y;
 
-        if (x < 0 || x >= _gridWidth || y < 0 || y >= _gridHeight)
+        if (x < 0 || x >= GridWidth || y < 0 || y >= GridHeight)
         {
             GD.PrintErr("Coordinates out of bounds");
             return;
@@ -200,8 +194,8 @@ public class Grid: Node2D
 		
         currentGridState[x, y].IsAlive = !currentGridState[x, y].IsAlive;
     }
-    
-    private void SaveState()
+
+    public void SaveState()
     {
         var currentGridState = _gridCells[_currentStateIndex];
         var newGridState = (Cell[,]) currentGridState.Clone();
@@ -215,8 +209,8 @@ public class Grid: Node2D
             _currentStateIndex--;
         }
     }
-    
-    private static Color GetCellColor(int liveNeighbors)
+
+    public Color GetCellColor(int liveNeighbors)
     {
         Dictionary<int, Color> colorMap = new()
         {

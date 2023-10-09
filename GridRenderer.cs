@@ -3,7 +3,7 @@ using System;
 
 namespace GameOfLife
 {
-	public class GridRenderer : Node2D
+	public partial class GridRenderer : Node2D
 	{
 		private Grid _grid;
 
@@ -14,25 +14,25 @@ namespace GameOfLife
 
 		private void DrawBox(int x, int y, Color color)
 		{
-			if (x < 0 || x >= _gridWidth || y < 0 || y >= _gridHeight)
+			if (x < 0 || x >= _grid.GridWidth || y < 0 || y >= _grid.GridHeight)
 			{
 				GD.PrintErr("Coordinates out of bounds");
 				return;
 			}
 
-			DrawRect(new Rect2(x * _boxSize, y * _boxSize, _boxSize, _boxSize), color);
+			DrawRect(new Rect2(x * _grid.BoxSize, y * _grid.BoxSize, _grid.BoxSize, _grid.BoxSize), color);
 		}
 
 		public override void _Draw()
 		{
 			// Check if _currentStateIndex is within valid bounds
-			if (_currentStateIndex >= 0 && _currentStateIndex < _gridCells.Count)
+			if (_grid._currentStateIndex >= 0 && _grid._currentStateIndex < _grid._gridCells.Count)
 			{
-				var currentGridState = _gridCells[_currentStateIndex];
+				var currentGridState = _grid._gridCells[_grid._currentStateIndex];
 
-				for (var x = 0; x < _gridWidth; x++)
+				for (var x = 0; x < _grid.GridWidth; x++)
 				{
-					for (var y = 0; y < _gridHeight; y++)
+					for (var y = 0; y < _grid.GridHeight; y++)
 					{
 						// Check if there is a cell at this position
 						if (currentGridState[x, y] == null)
@@ -40,7 +40,7 @@ namespace GameOfLife
 							continue;
 						}
 
-						if (_drawDeadCell)
+						if (_grid._drawDeadCell)
 						{
 							// Use the cell's color when drawing
 							DrawBox(x, y, currentGridState[x, y].Color);
@@ -57,17 +57,17 @@ namespace GameOfLife
 				}
 			}
 
-			if (_debugState)
+			if (_grid.DebugState)
 			{
-				for (var x = 0; x <= _gridWidth; x++)
+				for (var x = 0; x <= _grid.GridWidth; x++)
 				{
-					DrawLine(new Vector2(x * _boxSize, 0), new Vector2(x * _boxSize, _gridHeight * _boxSize),
+					DrawLine(new Vector2(x * _grid.BoxSize, 0), new Vector2(x * _grid.BoxSize, _grid.GridHeight * _grid.BoxSize),
 						new Color(0, 0, 0));
 				}
 
-				for (var y = 0; y <= _gridHeight; y++)
+				for (var y = 0; y <= _grid.GridHeight; y++)
 				{
-					DrawLine(new Vector2(0, y * _boxSize), new Vector2(_gridWidth * _boxSize, y * _boxSize),
+					DrawLine(new Vector2(0, y * _grid.BoxSize), new Vector2(_grid.GridWidth * _grid.BoxSize, y * _grid.BoxSize),
 						new Color(0, 0, 0));
 				}
 			}

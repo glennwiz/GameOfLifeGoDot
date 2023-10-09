@@ -3,47 +3,56 @@ using Godot;
 
 namespace GameOfLife;
 
-public class InputManager
+public partial class InputManager : Node2D
 {
-    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
+	private readonly Grid _grid;
+	private readonly GridController _controller;
+
+	public InputManager(Grid grid, GridController controller)
+	{
+		_grid = grid;
+		_controller = controller;
+	}
+
+	[SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
 	public override void _Input(InputEvent @event)
 	{
 		if (Input.IsKeyPressed(Key.Space))
 		{
-			_isPaused = !_isPaused;
+			_grid.IsPaused = !_grid.IsPaused;
 		}
 		
-		if (_isPaused) {
+		if (_grid.IsPaused) {
 			if (Input.IsKeyPressed(Key.Left)) {
-				Rewind();
+				_grid.Rewind();
 			}
 			if (Input.IsKeyPressed(Key.Right)) {
-				StepForward(); // You'll need to implement this
+				_grid.StepForward(); // You'll need to implement this
 			}
 		}
 
 		// Handle 'S' key press to clear cells and reset speed
 		if (Input.IsKeyPressed(Key.S))
 		{
-			_matrixManipulation.ClearGrid(_gridCells);
-			ResetUpdateTickRate();
+			_grid._matrixManipulation.ClearGrid(_grid._gridCells);
+			_grid.ResetUpdateTickRate();
 
 			QueueRedraw();
 		}
 
 		if (Input.IsKeyPressed(Key.Q))
 		{
-			_drawDeadCell = !_drawDeadCell;
+			_grid._drawDeadCell = !_grid._drawDeadCell;
 		}
 
 		if (Input.IsKeyPressed(Key.Up))
 		{
-			_updateTickRate -= 0.1f;
+			_grid.UpdateTickRate -= 0.1f;
 		}
 
 		if (Input.IsKeyPressed(Key.Down))
 		{
-			_updateTickRate += 0.1f;
+			_grid.UpdateTickRate += 0.1f;
 		}
 
 		// Handle mouse input to toggle cells
@@ -51,25 +60,25 @@ public class InputManager
 		{
 			if (mouseButtonEvent.DoubleClick)
 			{
-				_isMouseDown = false;
+				_grid._isMouseDown = false;
 				return;
 			}
 
 			if (mouseButtonEvent.Pressed)
 			{
-				_isMouseDown = mouseButtonEvent.Pressed;
-				if (_isMouseDown)
+				_grid._isMouseDown = mouseButtonEvent.Pressed;
+				if (_grid._isMouseDown)
 				{
 					var mousePosition = mouseButtonEvent.Position;
-					var x = (int) (mousePosition.X / _boxSize);
-					var y = (int) (mousePosition.Y / _boxSize);
-					ToggleCell(new Vector2(x, y));
+					var x = (int) (mousePosition.X / _grid.BoxSize);
+					var y = (int) (mousePosition.Y / _grid.BoxSize);
+					_grid.ToggleCell(new Vector2(x, y));
 					QueueRedraw();
 				}
 
-				if (!_isMouseDown)
+				if (!_grid._isMouseDown)
 				{
-					_isMouseDown = false;
+					_grid._isMouseDown = false;
 				}
 			}
 		}
@@ -84,8 +93,8 @@ public class InputManager
 				{true , true , true}
 			};
 
-			var glider = new GridManager.Pattern(3, 3, gliderCells);
-			DrawPattern(glider);
+			var glider = new PatternCreator.Pattern(3, 3, gliderCells);
+			_grid.DrawPattern(glider);
 		}
 
 		if (Input.IsKeyPressed(Key.Key2))
@@ -108,8 +117,8 @@ public class InputManager
 
 			var rotated = MatrixManipulation.RotateMatrix90(gosperCells);
 			
-			var gosperGliderGun = new GridManager.Pattern(36, 9, rotated);
-			DrawPattern(gosperGliderGun);
+			var gosperGliderGun = new PatternCreator.Pattern(36, 9, rotated);
+			_grid.DrawPattern(gosperGliderGun);
 		}
 
 		if (Input.IsKeyPressed(Key.Right))
