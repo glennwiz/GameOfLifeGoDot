@@ -5,7 +5,7 @@ using Godot;
 
 namespace GameOfLife;
 
-public partial class GridManager : Node2D
+public partial class GridManager : Node2D 
 {
 	private readonly Random _random = new ();
 	private int _boxSize = 10;
@@ -22,10 +22,13 @@ public partial class GridManager : Node2D
 
 	private bool _drawDeadCell = true;
 	private Color _newAliveColor = Colors.Yellow;
+
+	private MatrixManipulation _matrixManipulation = null;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		_matrixManipulation = new();
 		GD.Print("Ready!!");
 		InitGrid();
 	}
@@ -68,6 +71,7 @@ public partial class GridManager : Node2D
 		if (_timeElapsed >= _updateTickRate)
 		{
 			_gridCells[_currentStateIndex] = ApplyConwaysRules(_gridCells[_currentStateIndex]);
+			SaveState();
 			_timeElapsed = 0.0;
 		}
 
@@ -77,16 +81,24 @@ public partial class GridManager : Node2D
 	[SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
 	public override void _Input(InputEvent @event)
 	{
-
 		if (Input.IsKeyPressed(Key.Space))
 		{
 			_isPaused = !_isPaused;
+		}
+		
+		if (_isPaused) {
+			if (Input.IsKeyPressed(Key.Left)) {
+				Rewind();
+			}
+			if (Input.IsKeyPressed(Key.Right)) {
+				StepForward(); 
+			}
 		}
 
 		// Handle 'S' key press to clear cells and reset speed
 		if (Input.IsKeyPressed(Key.S))
 		{
-			ClearGrid();
+			_matrixManipulation.ClearGrid(_gridCells);
 			ResetUpdateTickRate();
 
 			QueueRedraw();
@@ -134,18 +146,6 @@ public partial class GridManager : Node2D
 				}
 			}
 		}
-		/*else if (@event is InputEventMouseMotion mouseMotionEvent)
-	{
-		if (_isMouseDown)
-		{
-			var mousePosition = mouseMotionEvent.Position;
-			var x = (int) (mousePosition.X / _boxSize);
-			var y = (int) (mousePosition.Y / _boxSize);
-
-			ToggleCell(new Vector2(x, y));
-			QueueRedraw();
-		}
-	}*/
 
 		if (Input.IsKeyPressed(Key.Key1))
 		{
@@ -179,7 +179,7 @@ public partial class GridManager : Node2D
 				{f    , f 	, f , f	, f	, f	, f	, f , f , f , f   , f   , true, true, f   , f   , f   , f    , f , f , f   , f   , f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , f   , f    }
 			};
 
-			var rotated = RotateMatrix90(gosperCells);
+			var rotated = MatrixManipulation.RotateMatrix90(gosperCells);
 			
 			var gosperGliderGun = new Pattern(36, 9, rotated);
 			DrawPattern(gosperGliderGun);
@@ -190,9 +190,30 @@ public partial class GridManager : Node2D
 			GD.Print("Right");
 		}
 	}
-	
 
+	private void StepForward()
+	{
+		_currentStateIndex++;
+		
+		if (_currentStateIndex >= _gridCells.Count)
+		{
+			_currentStateIndex = _gridCells.Count - 1;
+		}
+		
+		QueueRedraw();
+	}
 
+	private void Rewind()
+	{
+		_currentStateIndex--;
+		
+		if (_currentStateIndex < 0)
+		{
+			_currentStateIndex = 0;
+		}
+		
+		QueueRedraw();
+	}
 
 	private void DrawPattern(Pattern pattern)
 	{
@@ -425,39 +446,7 @@ public partial class GridManager : Node2D
 	
 	// Default speed value
 	private const float DefaultUpdateTickRate = 0.5f;
-	private void ClearGrid()
-	{
-		// Clear all cells
-		for (var x = 0; x < _gridWidth; x++)
-		{
-			for (var y = 0; y < _gridHeight; y++)
-			{
-				_gridCells[_currentStateIndex][x, y] = new Cell
-				{
-					Color = Colors.Black,
-					IsAlive = false,
-					Position = new Vector2(x, y)
-				};
-			}
-		}
-	}
 	
-	public static bool[,] RotateMatrix90(bool[,] matrix)
-	{
-		var height = matrix.GetLength(0);
-		var width = matrix.GetLength(1);
-		var rotated = new bool[width, height];
-
-		for (var i = 0; i < height; i++)
-		{
-			for (var j = 0; j < width; j++)
-			{
-				rotated[j, height - 1 - i] = matrix[i, j];
-			}
-		}
-
-		return rotated;
-	}
 	
 	public void ResetUpdateTickRate()
 	{
