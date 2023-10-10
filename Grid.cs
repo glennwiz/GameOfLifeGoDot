@@ -106,8 +106,7 @@ public partial class Grid: Node2D
         {
             CurrentStateIndex = GridCells.Count - 1;
         }
-        //trigger redraw
-        QueueRedraw();
+
     }
 
     public void Rewind()
@@ -118,8 +117,7 @@ public partial class Grid: Node2D
         {
             CurrentStateIndex = 0;
         }
-        //trigger redraw
-        QueueRedraw();
+
     }
     private Color RandomColor()
     {

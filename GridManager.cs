@@ -36,12 +36,12 @@ public partial class GridManager : Node2D
 	public override void _Process(double delta)
 	{
 		_controller._Process(delta);
-		QueueRedraw();
 	}
 	
 	public override void _Draw()
 	{
 		_renderer._Draw();
+		QueueRedraw();
 	}
 	
 	public override void _Input(InputEvent @event)

@@ -23,8 +23,6 @@ public partial class GridController : Node2D
             _grid.SaveState();
             _grid.TimeElapsed = 0.0;
         }
-
-        QueueRedraw();
     }
     
     private Cell[,] ApplyConwaysRules(Cell[,] currentGrid)
