@@ -7,12 +7,12 @@ namespace GameOfLife;
 
 public partial class GameGridHandler : Node2D 
 {
+	private readonly MatrixManipulation _matrixManipulation = new MatrixManipulation();
 	
 	private Grid _grid;
 	private GridController _controller;
 	private InputManager _inputManager;
 	private PatternCreator _patternCreator;
-	private MatrixManipulation _matrixManipulation = new MatrixManipulation();
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -30,9 +30,11 @@ public partial class GameGridHandler : Node2D
 		AddChild(_inputManager);
 		AddChild(_patternCreator);
 	}
-
+	
 	public override void _Process(double delta)
 	{
+		if (_grid.IsPaused) return;
+		
 		_controller._Process(delta);
 		QueueRedraw();
 	}
@@ -95,10 +97,5 @@ public partial class GameGridHandler : Node2D
 		}
 
 		DrawRect(new Rect2(x * _grid.BoxSize, y * _grid.BoxSize, _grid.BoxSize, _grid.BoxSize), color);
-	}
-	
-	public override void _Input(InputEvent @event)
-	{
-		_inputManager._Input(@event);
 	}
 }

@@ -27,7 +27,7 @@ public partial class InputManager : Node2D
 				_grid.Rewind();
 			}
 			if (Input.IsKeyPressed(Key.Right)) {
-				_grid.StepForward(); // You'll need to implement this
+				_grid.StepForward();
 			}
 		}
 
