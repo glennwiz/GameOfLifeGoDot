@@ -34,7 +34,7 @@ public partial class InputManager : Node2D
 		// Handle 'S' key press to clear cells and reset speed
 		if (Input.IsKeyPressed(Key.S))
 		{
-			_grid._matrixManipulation.ClearGrid(_grid._gridCells);
+			_grid.MatrixManipulation.ClearGrid(_grid.GridCells);
 			_grid.ResetUpdateTickRate();
 
 			QueueRedraw();
@@ -42,7 +42,7 @@ public partial class InputManager : Node2D
 
 		if (Input.IsKeyPressed(Key.Q))
 		{
-			_grid._drawDeadCell = !_grid._drawDeadCell;
+			_grid.DrawDeadCell = !_grid.DrawDeadCell;
 		}
 
 		if (Input.IsKeyPressed(Key.Up))
@@ -60,14 +60,14 @@ public partial class InputManager : Node2D
 		{
 			if (mouseButtonEvent.DoubleClick)
 			{
-				_grid._isMouseDown = false;
+				_grid.IsMouseDown = false;
 				return;
 			}
 
 			if (mouseButtonEvent.Pressed)
 			{
-				_grid._isMouseDown = mouseButtonEvent.Pressed;
-				if (_grid._isMouseDown)
+				_grid.IsMouseDown = mouseButtonEvent.Pressed;
+				if (_grid.IsMouseDown)
 				{
 					var mousePosition = mouseButtonEvent.Position;
 					var x = (int) (mousePosition.X / _grid.BoxSize);
@@ -76,9 +76,9 @@ public partial class InputManager : Node2D
 					QueueRedraw();
 				}
 
-				if (!_grid._isMouseDown)
+				if (!_grid.IsMouseDown)
 				{
-					_grid._isMouseDown = false;
+					_grid.IsMouseDown = false;
 				}
 			}
 		}

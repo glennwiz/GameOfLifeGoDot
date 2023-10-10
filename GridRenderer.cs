@@ -26,9 +26,9 @@ namespace GameOfLife
 		public override void _Draw()
 		{
 			// Check if _currentStateIndex is within valid bounds
-			if (_grid._currentStateIndex >= 0 && _grid._currentStateIndex < _grid._gridCells.Count)
+			if (_grid.CurrentStateIndex >= 0 && _grid.CurrentStateIndex < _grid.GridCells.Count)
 			{
-				var currentGridState = _grid._gridCells[_grid._currentStateIndex];
+				var currentGridState = _grid.GridCells[_grid.CurrentStateIndex];
 
 				for (var x = 0; x < _grid.GridWidth; x++)
 				{
@@ -40,7 +40,7 @@ namespace GameOfLife
 							continue;
 						}
 
-						if (_grid._drawDeadCell)
+						if (_grid.DrawDeadCell)
 						{
 							// Use the cell's color when drawing
 							DrawBox(x, y, currentGridState[x, y].Color);

@@ -7,23 +7,17 @@ namespace GameOfLife;
 public partial class Grid: Node2D
 {
     public static bool _debugState = true;
-    public bool _isMouseDown;	
+    public bool IsMouseDown { get; set; }	
  
-    public bool _drawDeadCell = true;
-    public Color _newAliveColor = Colors.Yellow;
+    public bool DrawDeadCell  { get;set;}
+    public Color NewAliveColor { get; set; }
 
     private readonly Random _random = new ();
-    private int _boxSize = 10;
- 
-
-    public readonly List<Cell[,]> _gridCells = new ();
     
-    public int _currentStateIndex;
-    public MatrixManipulation _matrixManipulation = null;
-
+    public int CurrentStateIndex { get; set; }
+    public MatrixManipulation MatrixManipulation { get; set;}
     public int GridWidth { get; set; }
     public int GridHeight { get; set; }
-    
     public bool IsPaused { get; set; }
     public double TimeElapsed { get; set; }
     public float UpdateTickRate { get; set; }
@@ -39,16 +33,16 @@ public partial class Grid: Node2D
         UpdateTickRate = DefaultUpdateTickRate;
     }
 
-    public Grid()
+    public Grid(MatrixManipulation matrixManipulation)
     {
-        _matrixManipulation = new MatrixManipulation();
+        MatrixManipulation = matrixManipulation;
     }
-    
+
     private void InitGrid()
     {
         var viewportSize = GetViewportRect().Size;
-        GridWidth = (int)viewportSize.X / _boxSize;
-        GridHeight = (int)viewportSize.Y / _boxSize;
+        GridWidth = (int)viewportSize.X / BoxSize;
+        GridHeight = (int)viewportSize.Y / BoxSize;
         var initialState = new Cell[GridWidth, GridHeight];
 		
         for (var i = 0; i < GridWidth; i++)
@@ -65,7 +59,7 @@ public partial class Grid: Node2D
                 };
             }
         }
-        _gridCells.Add(initialState);
+        GridCells.Add(initialState);
     }
     
     public int CountLiveNeighbors(Cell[,] grid, int x, int y)
@@ -103,11 +97,11 @@ public partial class Grid: Node2D
 
     public void StepForward()
     {
-        _currentStateIndex++;
+        CurrentStateIndex++;
 		
-        if (_currentStateIndex >= _gridCells.Count)
+        if (CurrentStateIndex >= GridCells.Count)
         {
-            _currentStateIndex = _gridCells.Count - 1;
+            CurrentStateIndex = GridCells.Count - 1;
         }
         //trigger redraw
         QueueRedraw();
@@ -115,11 +109,11 @@ public partial class Grid: Node2D
 
     public void Rewind()
     {
-        _currentStateIndex--;
+        CurrentStateIndex--;
 		
-        if (_currentStateIndex < 0)
+        if (CurrentStateIndex < 0)
         {
-            _currentStateIndex = 0;
+            CurrentStateIndex = 0;
         }
         //trigger redraw
         QueueRedraw();
@@ -131,13 +125,13 @@ public partial class Grid: Node2D
 
     public void DrawPattern(PatternCreator.Pattern pattern)
     {
-        var currentGridState = _gridCells[_currentStateIndex];
+        var currentGridState = GridCells[CurrentStateIndex];
         var patternWidth = pattern.Width;
         var patternHeight = pattern.Height;
         var patternCells = pattern.Cells;
         var mousePosition = GetGlobalMousePosition();
-        var mousePositionX = (int) (mousePosition.X / _boxSize);
-        var mousePositionY = (int) (mousePosition.Y / _boxSize);
+        var mousePositionX = (int) (mousePosition.X / BoxSize);
+        var mousePositionY = (int) (mousePosition.Y / BoxSize);
 		
         for (var i = 0; i < patternWidth; i++)
         {
@@ -179,7 +173,7 @@ public partial class Grid: Node2D
             return;
         }
 
-        var currentGridState = _gridCells[_currentStateIndex];
+        var currentGridState = GridCells[CurrentStateIndex];
 		
         if(currentGridState[x, y] == null)
         {
@@ -197,16 +191,16 @@ public partial class Grid: Node2D
 
     public void SaveState()
     {
-        var currentGridState = _gridCells[_currentStateIndex];
+        var currentGridState = GridCells[CurrentStateIndex];
         var newGridState = (Cell[,]) currentGridState.Clone();
-        _gridCells.Add(newGridState);
-        _currentStateIndex++;
+        GridCells.Add(newGridState);
+        CurrentStateIndex++;
 
         // Optionally, limit the history to the last 100 states
-        if (_gridCells.Count > 100)
+        if (GridCells.Count > 100)
         {
-            _gridCells.RemoveAt(0);
-            _currentStateIndex--;
+            GridCells.RemoveAt(0);
+            CurrentStateIndex--;
         }
     }
 

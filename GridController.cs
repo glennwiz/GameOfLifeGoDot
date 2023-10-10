@@ -19,7 +19,7 @@ public partial class GridController : Node2D
         _grid.TimeElapsed += delta;
         if (_grid.TimeElapsed >= _grid.UpdateTickRate)
         {
-            _grid._gridCells[_grid._currentStateIndex] = ApplyConwaysRules(_grid._gridCells[_grid._currentStateIndex]);
+            _grid.GridCells[_grid.CurrentStateIndex] = ApplyConwaysRules(_grid.GridCells[_grid.CurrentStateIndex]);
             _grid.SaveState();
             _grid.TimeElapsed = 0.0;
         }

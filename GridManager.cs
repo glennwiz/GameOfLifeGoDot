@@ -13,11 +13,12 @@ public partial class GridManager : Node2D
 	private GridController _controller;
 	private InputManager _inputManager;
 	private PatternCreator _patternCreator;
+	private MatrixManipulation _matrixManipulation = new MatrixManipulation();
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
-	{
-		_grid = new Grid();
+	{  
+		_grid = new Grid(_matrixManipulation);
 		_renderer = new GridRenderer(_grid);
 		_controller = new GridController(_grid);
 		_inputManager = new InputManager(_grid, _controller);
