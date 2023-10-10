@@ -4,13 +4,6 @@ namespace GameOfLife;
 
 public partial class PatternCreator : Node2D
 {
-    private readonly Grid _grid;
-
-    public PatternCreator(Grid grid)
-    {
-        _grid = grid;
-    }
-
     public class Pattern
     {
         public int Width { get; } // Width of the pattern grid

@@ -6,12 +6,10 @@ namespace GameOfLife;
 public partial class InputManager : Node2D
 {
 	private readonly Grid _grid;
-	private readonly GridController _controller;
 
-	public InputManager(Grid grid, GridController controller)
+	public InputManager(Grid grid)
 	{
 		_grid = grid;
-		_controller = controller;
 	}
 
 	[SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]

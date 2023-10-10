@@ -6,7 +6,6 @@ namespace GameOfLife;
 
 public partial class Grid: Node2D
 {
-    public static bool _debugState = true;
     public bool IsMouseDown { get; set; }	
  
     public bool DrawDeadCell  { get;set;}
@@ -15,14 +14,14 @@ public partial class Grid: Node2D
     private readonly Random _random = new ();
     private Vector2 _gridSize;
 
-    public int CurrentStateIndex { get; set; } = 0;
-    public MatrixManipulation MatrixManipulation { get; set;}
+    public int CurrentStateIndex { get; set; }
+    public MatrixManipulation MatrixManipulation { get; }
     public int GridWidth { get; set; }
     public int GridHeight { get; set; } 
-    public bool IsPaused { get; set; } = false;
+    public bool IsPaused { get; set; }
     public double TimeElapsed { get; set; }
     public float UpdateTickRate { get; set; } = 0.5f;
-    public List<Cell[,]> GridCells { get; set; } = new List<Cell[,]>(); 
+    public List<Cell[,]> GridCells { get; } = new(); 
     public int BoxSize { get; set; } = 10;
     public bool DebugState { get; set; } = true;
 
