@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Godot;
 
 namespace GameOfLife;
 
 public partial class GameGridHandler : Node2D 
 {
-	private readonly MatrixManipulation _matrixManipulation = new MatrixManipulation();
+	private readonly MatrixManipulation _matrixManipulation = new();
 	
 	private Grid _grid;
 	private GridController _controller;
@@ -17,7 +14,7 @@ public partial class GameGridHandler : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{  
-		Vector2 gridSize = GetViewportRect().Size;
+		var gridSize = GetViewportRect().Size;
 		
 		_grid = new Grid(_matrixManipulation,gridSize);
 		
@@ -35,7 +32,7 @@ public partial class GameGridHandler : Node2D
 	{
 		if (_grid.IsPaused) return;
 		
-		_controller._Process(delta);
+		_controller.GridProcess(delta);
 		QueueRedraw();
 	}
 	

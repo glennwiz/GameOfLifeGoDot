@@ -12,9 +12,10 @@ public partial class GridController : Node2D
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta)
+    public  void GridProcess(double delta)
     {
-         if (_grid.IsPaused) return;
+       
+        if (_grid.IsPaused) return;
 		
         _grid.TimeElapsed += delta;
         if (_grid.TimeElapsed >= _grid.UpdateTickRate)
