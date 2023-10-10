@@ -63,5 +63,4 @@ public partial class GridController : Node2D
 
         return newGrid;
     }
-
 }

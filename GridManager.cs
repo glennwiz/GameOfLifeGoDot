@@ -18,7 +18,9 @@ public partial class GridManager : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{  
-		_grid = new Grid(_matrixManipulation);
+		Vector2 gridSize = GetViewportRect().Size;
+		
+		_grid = new Grid(_matrixManipulation,gridSize);
 		_renderer = new GridRenderer(_grid);
 		_controller = new GridController(_grid);
 		_inputManager = new InputManager(_grid, _controller);
@@ -29,5 +31,21 @@ public partial class GridManager : Node2D
 		AddChild(_controller);
 		AddChild(_inputManager);
 		AddChild(_patternCreator);
+	}
+
+	public override void _Process(double delta)
+	{
+		_controller._Process(delta);
+		QueueRedraw();
+	}
+	
+	public override void _Draw()
+	{
+		_renderer._Draw();
+	}
+	
+	public override void _Input(InputEvent @event)
+	{
+		_inputManager._Input(@event);
 	}
 }

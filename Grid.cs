@@ -10,20 +10,21 @@ public partial class Grid: Node2D
     public bool IsMouseDown { get; set; }	
  
     public bool DrawDeadCell  { get;set;}
-    public Color NewAliveColor { get; set; }
+    private Color NewAliveColor { get; set; }
 
     private readonly Random _random = new ();
-    
-    public int CurrentStateIndex { get; set; }
+    private Vector2 _gridSize;
+
+    public int CurrentStateIndex { get; set; } = 0;
     public MatrixManipulation MatrixManipulation { get; set;}
     public int GridWidth { get; set; }
-    public int GridHeight { get; set; }
-    public bool IsPaused { get; set; }
+    public int GridHeight { get; set; } 
+    public bool IsPaused { get; set; } = false;
     public double TimeElapsed { get; set; }
-    public float UpdateTickRate { get; set; }
-    public List<Cell[,]> GridCells { get; }
-    public int BoxSize { get; set; }
-    public bool DebugState { get; set; }
+    public float UpdateTickRate { get; set; } = 0.5f;
+    public List<Cell[,]> GridCells { get; set; } = new List<Cell[,]>(); 
+    public int BoxSize { get; set; } = 10;
+    public bool DebugState { get; set; } = true;
 
     // Default speed value
     private const float DefaultUpdateTickRate = 0.5f;
@@ -33,14 +34,16 @@ public partial class Grid: Node2D
         UpdateTickRate = DefaultUpdateTickRate;
     }
 
-    public Grid(MatrixManipulation matrixManipulation)
+    public Grid(MatrixManipulation matrixManipulation, Vector2 gridSize)
     {
+        _gridSize = gridSize;
         MatrixManipulation = matrixManipulation;
+        InitGrid();
     }
 
     private void InitGrid()
     {
-        var viewportSize = GetViewportRect().Size;
+        var viewportSize = _gridSize;;
         GridWidth = (int)viewportSize.X / BoxSize;
         GridHeight = (int)viewportSize.Y / BoxSize;
         var initialState = new Cell[GridWidth, GridHeight];
