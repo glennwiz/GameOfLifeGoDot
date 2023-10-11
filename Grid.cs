@@ -71,24 +71,15 @@ public partial class Grid: Node2D
         var height = grid.GetLength(1);
 
         // Define offsets for all 8 neighbors
-        int[] xOffset = { -1, 0, 1, -1, 1, -1, 0, 1 };
-        int[] yOffset = { -1, -1, -1, 0, 0, 1, 1, 1 };
-
-        for (var i = 0; i < 8; i++)
+        (int, int)[] offsets =
         {
-            var nx = x + xOffset[i];
-            var ny = y + yOffset[i];
+            (-1,-1), (0, -1), (1, -1), (-1, 0),  ( 1,  0), (-1, 1), (0, 1), (1, 1)
+        };
 
-            // Wrap around edges
-            if (nx < 0)
-                nx = width - 1;
-            else if (nx >= width)
-                nx = 0;
-
-            if (ny < 0)
-                ny = height - 1;
-            else if (ny >= height)
-                ny = 0;
+        foreach (var offset in offsets)
+        {
+            var nx = (x + offset.Item1 + width) % width;
+            var ny = (y + offset.Item2 + height) % height;
 
             if (grid[nx, ny].IsAlive)
                 count++;
