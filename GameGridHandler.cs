@@ -30,7 +30,8 @@ public partial class GameGridHandler : Node2D
 	public override void _Process(double delta)
 	{
 		if (_grid.IsPaused)
-		{ QueueRedraw();
+		{ 
+			QueueRedraw();
 			return;
 		}
 		

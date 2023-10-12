@@ -6,9 +6,9 @@ public partial class PatternCreator : Node2D
 {
     public class Pattern
     {
-        public int Width { get; } // Width of the pattern grid
-        public int Height { get; } // Height of the pattern grid
-        public bool[,] Cells { get; } // 2D array representing the pattern's initial state
+        public int Width { get; } 
+        public int Height { get; } 
+        public bool[,] Cells { get; }
 
         public Pattern(int width, int height, bool[,] cells)
         {

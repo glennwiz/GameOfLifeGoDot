@@ -21,7 +21,7 @@ public partial class Grid: Node2D
     public bool IsPaused { get; set; }
     public double TimeElapsed { get; set; }
     public float UpdateTickRate { get; set; } = 0.5f;
-    public List<Cell[,]> GridCells { get; } = new(); 
+    public List<Cell[,]> GridCells { get; set; } = new(); 
     public int BoxSize { get; set; } = 10;
     public bool DebugState { get; set; } = true;
 
@@ -73,7 +73,7 @@ public partial class Grid: Node2D
         // Define offsets for all 8 neighbors
         (int, int)[] offsets =
         {
-            (-1,-1), (0, -1), (1, -1), (-1, 0),  ( 1,  0), (-1, 1), (0, 1), (1, 1)
+            (-1,-1), (0, -1), (1, -1), (-1, 0), ( 1,  0), (-1, 1), (0, 1), (1, 1)
         };
 
         foreach (var offset in offsets)
@@ -96,7 +96,6 @@ public partial class Grid: Node2D
         {
             CurrentStateIndex = GridCells.Count - 1;
         }
-
     }
 
     public void Rewind()
@@ -107,8 +106,8 @@ public partial class Grid: Node2D
         {
             CurrentStateIndex = 0;
         }
-
     }
+    
     private Color RandomColor()
     {
         return new Color((float)_random.NextDouble(), (float)_random.NextDouble(), (float)_random.NextDouble());
@@ -182,17 +181,18 @@ public partial class Grid: Node2D
 
     public void SaveState()
     {
+        if(IsPaused) return;
+        
         var currentGridState = GridCells[CurrentStateIndex];
         var newGridState = (Cell[,]) currentGridState.Clone();
         GridCells.Add(newGridState);
         CurrentStateIndex++;
 
         // Optionally, limit the history to the last 100 states
-        if (GridCells.Count > 100)
-        {
-            GridCells.RemoveAt(0);
-            CurrentStateIndex--;
-        }
+        if (GridCells.Count <= 100) return;
+        
+        GridCells.RemoveAt(0);
+        CurrentStateIndex--;
     }
 
     public Color GetCellColor(int liveNeighbors)

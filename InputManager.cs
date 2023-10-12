@@ -32,8 +32,11 @@ public partial class InputManager : Node2D
 		// Handle 'S' key press to clear cells and reset speed
 		if (Input.IsKeyPressed(Key.S))
 		{
-			_grid.MatrixManipulation.ClearGrid(_grid.GridCells);
+			_grid.MatrixManipulation.ClearGrid(_grid);
 			_grid.ResetUpdateTickRate();
+			
+			//we need to clear the whole List of grids
+			
 
 			QueueRedraw();
 		}
