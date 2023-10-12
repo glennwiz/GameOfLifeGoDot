@@ -59,6 +59,7 @@ public partial class InputManager : Node2D
 			if (mouseButtonEvent.DoubleClick)
 			{
 				_grid.IsMouseDown = false;
+				 QueueRedraw();
 				return;
 			}
 
@@ -77,6 +78,7 @@ public partial class InputManager : Node2D
 				if (!_grid.IsMouseDown)
 				{
 					_grid.IsMouseDown = false;
+					QueueRedraw();
 				}
 			}
 		}
