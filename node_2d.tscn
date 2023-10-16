@@ -1,6 +1,24 @@
-[gd_scene load_steps=2 format=3 uid="uid://c8wopbd80m8rh"]
+[gd_scene load_steps=5 format=3 uid="uid://c8wopbd80m8rh"]
 
-[ext_resource type="Script" path="res://GridManager.cs" id="1_pv0v3"]
+[ext_resource type="Script" path="res://GameGridHandler.cs" id="1_8h4re"]
+[ext_resource type="Shader" path="res://node_2d.gdshader" id="1_y2qpu"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qs1oe"]
+shader = ExtResource("1_y2qpu")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7khx7"]
+resource_local_to_scene = true
+shader = ExtResource("1_y2qpu")
 
 [node name="Grid" type="Node2D"]
-script = ExtResource("1_pv0v3")
+script = ExtResource("1_8h4re")
+
+[node name="Shader" type="Node2D" parent="."]
+material = SubResource("ShaderMaterial_qs1oe")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+material = SubResource("ShaderMaterial_7khx7")
+offset_right = 1162.0
+offset_bottom = 650.0

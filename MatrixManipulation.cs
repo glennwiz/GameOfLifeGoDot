@@ -22,16 +22,16 @@ public class MatrixManipulation
         return rotated;
     }
 	
-    public void ClearGrid(List<Cell[,]> grids)
+    public void ClearGrid(Grid grid)
     {
-        foreach (var grid in grids)
+        foreach (var g in grid.GridCells)
         {
             // Clear all cells 
-            for (var x = 0; x <grid.GetLength(0) ; x++)
+            for (var x = 0; x <g.GetLength(0) ; x++)
             {
-                for (var y = 0; y < grid.GetLength(1); y++)
+                for (var y = 0; y < g.GetLength(1); y++)
                 {
-                    grid[x, y] = new Cell
+                    g[x, y] = new Cell
                     {
                         Color = Colors.Black,
                         IsAlive = false,
