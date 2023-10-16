@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -6,210 +6,292 @@ namespace GameOfLife;
 
 public partial class Grid: Node2D
 {
-    public bool IsMouseDown { get; set; }	
+	public bool IsMouseDown { get; set; }	
  
-    public bool DrawDeadCell  { get;set;}
-    private Color NewAliveColor { get; set; }
+	public bool DrawDeadCell  { get;set;}
+	private Color NewAliveColor { get; set; }
 
-    private readonly Random _random = new ();
-    private Vector2 _gridSize;
+	private readonly Random _random = new ();
+	private Vector2 _gridSize;
 
-    public int CurrentStateIndex { get; set; }
-    public MatrixManipulation MatrixManipulation { get; }
-    public int GridWidth { get; set; }
-    public int GridHeight { get; set; } 
-    public bool IsPaused { get; set; }
-    public double TimeElapsed { get; set; }
-    public float UpdateTickRate { get; set; } = 0.5f;
-    public List<Cell[,]> GridCells { get; set; } = new(); 
-    public int BoxSize { get; set; } = 10;
-    public bool DebugState { get; set; } = true;
+	public int CurrentStateIndex { get; set; }
+	public MatrixManipulation MatrixManipulation { get; }
+	public int GridWidth { get; set; }
+	public int GridHeight { get; set; } 
+	public bool IsPaused { get; set; }
+	public double TimeElapsed { get; set; }
+	public float UpdateTickRate { get; set; } = 0.5f;
+	public List<Cell[,]> GridCells { get; set; } = new(); 
+	public int BoxSize { get; set; } = 10;
+	public bool DebugState { get; set; } = true;
 
-    // Default speed value
-    private const float DefaultUpdateTickRate = 0.5f;
+	// Default speed value
+	private const float DefaultUpdateTickRate = 0.5f;
 	
-    public void ResetUpdateTickRate()
-    {
-        UpdateTickRate = DefaultUpdateTickRate;
-    }
+	public void ResetUpdateTickRate()
+	{
+		UpdateTickRate = DefaultUpdateTickRate;
+	}
 
-    public Grid(MatrixManipulation matrixManipulation, Vector2 gridSize)
-    {
-        _gridSize = gridSize;
-        MatrixManipulation = matrixManipulation;
-        InitGrid();
-    }
+	public Grid(MatrixManipulation matrixManipulation, Vector2 gridSize)
+	{
+		_gridSize = gridSize;
+		MatrixManipulation = matrixManipulation;
+		InitGrid();
+	}
 
-    private void InitGrid()
-    {
-        var viewportSize = _gridSize;;
-        GridWidth = (int)viewportSize.X / BoxSize;
-        GridHeight = (int)viewportSize.Y / BoxSize;
-        var initialState = new Cell[GridWidth, GridHeight];
+	public void MirrorAndShift()
+	{
+		// Implement  logic to mirror the grid and shift it 3px to the right.
+	}
+
+
+	private void InitGrid()
+	{
+		var viewportSize = _gridSize;;
+		GridWidth = (int)viewportSize.X / BoxSize;
+		GridHeight = (int)viewportSize.Y / BoxSize;
+		var initialState = new Cell[GridWidth, GridHeight];
 		
-        for (var i = 0; i < GridWidth; i++)
-        {
-            for (var j = 0; j < GridHeight; j++)
-            {
-                var cellColor = Colors.Black;
+		for (var i = 0; i < GridWidth; i++)
+		{
+			for (var j = 0; j < GridHeight; j++)
+			{
+				var cellColor = Colors.Black;
 					
-                initialState[i, j] = new Cell
-                {
-                    Color = cellColor,
-                    IsAlive = _random.Next(0, 2) == 1,
-                    Position = new Vector2(i, j)
-                };
-            }
-        }
-        GridCells.Add(initialState);
-    }
-    
-    public int CountLiveNeighbors(Cell[,] grid, int x, int y)
-    {
-        var count = 0;
-        var width = grid.GetLength(0);
-        var height = grid.GetLength(1);
-
-        // Define offsets for all 8 neighbors
-        (int, int)[] offsets =
-        {
-            (-1,-1), (0, -1), (1, -1), (-1, 0), ( 1,  0), (-1, 1), (0, 1), (1, 1)
-        };
-
-        foreach (var offset in offsets)
-        {
-            var nx = (x + offset.Item1 + width) % width;
-            var ny = (y + offset.Item2 + height) % height;
-
-            if (grid[nx, ny].IsAlive)
-                count++;
-        }
-
-        return count;
-    }
-
-    public void StepForward()
-    {
-        CurrentStateIndex++;
-		
-        if (CurrentStateIndex >= GridCells.Count)
-        {
-            CurrentStateIndex = GridCells.Count - 1;
-        }
-    }
-
-    public void Rewind()
-    {
-        CurrentStateIndex--;
-		
-        if (CurrentStateIndex < 0)
-        {
-            CurrentStateIndex = 0;
-        }
-    }
-    
-    private Color RandomColor()
-    {
-        return new Color((float)_random.NextDouble(), (float)_random.NextDouble(), (float)_random.NextDouble());
-    }
-
-    public void DrawPattern(PatternCreator.Pattern pattern)
-    {
-        var currentGridState = GridCells[CurrentStateIndex];
-        var patternWidth = pattern.Width;
-        var patternHeight = pattern.Height;
-        var patternCells = pattern.Cells;
-        var mousePosition = GetGlobalMousePosition();
-        var mousePositionX = (int) (mousePosition.X / BoxSize);
-        var mousePositionY = (int) (mousePosition.Y / BoxSize);
-		
-        for (var i = 0; i < patternWidth; i++)
-        {
-            for (var j = 0; j < patternHeight; j++)
-            {
-                //index out of bounds check, print and return
-                try
-                {
-                    var cellColor = Colors.Black;
-                    if (patternCells[i, j])
-                    {
-                        cellColor = Colors.White;
-                    }
+				initialState[i, j] = new Cell
+				{
+					Color = cellColor,
+					IsAlive = false,
+					Position = new Vector2(i, j)
+				};
 				
-                    currentGridState[mousePositionX + i, mousePositionY + j] = new Cell
-                    {
-                        Color = cellColor,
-                        IsAlive = patternCells[i, j],
-                        Position = new Vector2(mousePositionX + i, mousePositionY + j)
-                    };
-                }
-                catch (IndexOutOfRangeException e)
-                {
-                    GD.Print("i = " + i + " | " + "j = " + j);
-                    Console.WriteLine(e);
-                }
-            }
-        }
-    }
-
-    public void ToggleCell(Vector2 cellCoords)
-    {
-        var x = (int) cellCoords.X;
-        var y = (int) cellCoords.Y;
-
-        if (x < 0 || x >= GridWidth || y < 0 || y >= GridHeight)
-        {
-            GD.PrintErr("Coordinates out of bounds");
-            return;
-        }
-
-        var currentGridState = GridCells[CurrentStateIndex];
+				if(i == 40 && j == 40 )
+				{
+					initialState[i, j] = new Cell
+					{
+						Color = Colors.White,
+						IsAlive = true,
+						Position = new Vector2(i, j)
+					};
+				}
+				
+				if(i == 41 && j == 40 )
+				{
+					initialState[i, j] = new Cell
+					{
+						Color = Colors.White,
+						IsAlive = true,
+						Position = new Vector2(i, j)
+					};
+				}
+				
+				if(i == 42 && j == 40 )
+				{
+					initialState[i, j] = new Cell
+					{
+						Color = Colors.White,
+						IsAlive = true,
+						Position = new Vector2(i, j)
+					};
+				}
+				
+				if(i == 40 && j == 41 )
+				{
+					initialState[i, j] = new Cell
+					{
+						Color = Colors.White,
+						IsAlive = true,
+						Position = new Vector2(i, j)
+					};
+				}
+				
+				if(i == 42 && j == 41 )
+				{
+					initialState[i, j] = new Cell
+					{
+						Color = Colors.White,
+						IsAlive = true,
+						Position = new Vector2(i, j)
+					};
+				}
+				if(i == 40 && j == 42 )
+				{
+					initialState[i, j] = new Cell
+					{
+						Color = Colors.White,
+						IsAlive = true,
+						Position = new Vector2(i, j)
+					};
+				}
+				
+				if(i == 42 && j == 42 )
+				{
+					initialState[i, j] = new Cell
+					{
+						Color = Colors.White,
+						IsAlive = true,
+						Position = new Vector2(i, j)
+					};
+				}
+			}
+		}
 		
-        if(currentGridState[x, y] == null)
-        {
-            currentGridState[x, y] = new Cell()
-            {
-                IsAlive = true , 
-                Position = new Vector2(x, y),
-                Color = Colors.Yellow,
-            };
-            return;
-        }
+		//use pattern to update the initial state
+		var pattern = new PatternCreator();
+		initialState = PatternCreator.CreatePattern(PatternCreator.Pattern.Star, initialState);
 		
-        currentGridState[x, y].IsAlive = !currentGridState[x, y].IsAlive;
-    }
+		GridCells.Add(initialState);
+		
+		
+	}
+	
+	public int CountLiveNeighbors(Cell[,] grid, int x, int y)
+	{
+		var count = 0;
+		var width = grid.GetLength(0);
+		var height = grid.GetLength(1);
 
-    public void SaveState()
-    {
-        if(IsPaused) return;
-        
-        var currentGridState = GridCells[CurrentStateIndex];
-        var newGridState = (Cell[,]) currentGridState.Clone();
-        GridCells.Add(newGridState);
-        CurrentStateIndex++;
+		// Define offsets for all 8 neighbors
+		(int, int)[] offsets =
+		{
+			(-1,-1), (0, -1), (1, -1), (-1, 0), ( 1,  0), (-1, 1), (0, 1), (1, 1)
+		};
 
-        // Optionally, limit the history to the last 100 states
-        if (GridCells.Count <= 100) return;
-        
-        GridCells.RemoveAt(0);
-        CurrentStateIndex--;
-    }
+		foreach (var offset in offsets)
+		{
+			var nx = (x + offset.Item1 + width) % width;
+			var ny = (y + offset.Item2 + height) % height;
 
-    public Color GetCellColor(int liveNeighbors)
-    {
-        Dictionary<int, Color> colorMap = new()
-        {
-            {0, Colors.Black},
-            {1, Colors.Red},
-            {2, Colors.Yellow},
-            {3, Colors.Green},
-            {4, Colors.Cyan},
-            {5, Colors.Blue},
-            {6, Colors.Magenta},
-            {7, Colors.White},
-        };
+			if (grid[nx, ny].IsAlive)
+				count++;
+		}
 
-        var cellColor = colorMap.ContainsKey(liveNeighbors) ? colorMap[liveNeighbors] : Colors.Gray;
-        return cellColor;
-    }
+		return count;
+	}
+
+	public void StepForward()
+	{
+		CurrentStateIndex++;
+		
+		if (CurrentStateIndex >= GridCells.Count)
+		{
+			CurrentStateIndex = GridCells.Count - 1;
+		}
+	}
+
+	public void Rewind()
+	{
+		CurrentStateIndex--;
+		
+		if (CurrentStateIndex < 0)
+		{
+			CurrentStateIndex = 0;
+		}
+	}
+	
+	private Color RandomColor()
+	{
+		return new Color((float)_random.NextDouble(), (float)_random.NextDouble(), (float)_random.NextDouble());
+	}
+
+	public void DrawPattern(PatternCreator.Pattern pattern)
+	{
+		var currentGridState = GridCells[CurrentStateIndex];
+		var patternWidth = pattern.Width;
+		var patternHeight = pattern.Height;
+		var patternCells = pattern.Cells;
+		var mousePosition = GetGlobalMousePosition();
+		var mousePositionX = (int) (mousePosition.X / BoxSize);
+		var mousePositionY = (int) (mousePosition.Y / BoxSize);
+		
+		for (var i = 0; i < patternWidth; i++)
+		{
+			for (var j = 0; j < patternHeight; j++)
+			{
+				//index out of bounds check, print and return
+				try
+				{
+					var cellColor = Colors.Black;
+					if (patternCells[i, j])
+					{
+						cellColor = Colors.White;
+					}
+				
+					currentGridState[mousePositionX + i, mousePositionY + j] = new Cell
+					{
+						Color = cellColor,
+						IsAlive = patternCells[i, j],
+						Position = new Vector2(mousePositionX + i, mousePositionY + j)
+					};
+				}
+				catch (IndexOutOfRangeException e)
+				{
+					GD.Print("i = " + i + " | " + "j = " + j);
+					Console.WriteLine(e);
+				}
+			}
+		}
+	}
+
+	public void ToggleCell(Vector2 cellCoords)
+	{
+		var x = (int) cellCoords.X;
+		var y = (int) cellCoords.Y;
+
+		if (x < 0 || x >= GridWidth || y < 0 || y >= GridHeight)
+		{
+			GD.PrintErr("Coordinates out of bounds");
+			return;
+		}
+
+		var currentGridState = GridCells[CurrentStateIndex];
+		
+		if(currentGridState[x, y] == null)
+		{
+			currentGridState[x, y] = new Cell()
+			{
+				IsAlive = true , 
+				Position = new Vector2(x, y),
+				Color = Colors.Yellow,
+			};
+			return;
+		}
+		
+		currentGridState[x, y].IsAlive = !currentGridState[x, y].IsAlive;
+	}
+
+	public void SaveState()
+	{
+		if(IsPaused) return;
+		
+		var currentGridState = GridCells[CurrentStateIndex];
+		var newGridState = (Cell[,]) currentGridState.Clone();
+		GridCells.Add(newGridState);
+		CurrentStateIndex++;
+
+		// Optionally, limit the history to the last 100 states
+		if (GridCells.Count <= 100) return;
+		
+		GridCells.RemoveAt(0);
+		CurrentStateIndex--;
+	}
+
+	public Color GetCellColor(int liveNeighbors)
+	{
+		Dictionary<int, Color> colorMap = new()
+		{
+			{0, Colors.Black},
+			{1, Colors.Red},
+			{2, Colors.Yellow},
+			{3, Colors.Green},
+			{4, Colors.Cyan},
+			{5, Colors.Blue},
+			{6, Colors.Magenta},
+			{7, Colors.White},
+		};
+
+		var cellColor = colorMap.ContainsKey(liveNeighbors) ? colorMap[liveNeighbors] : Colors.Gray;
+		return cellColor;
+	}
 }

@@ -86,6 +86,11 @@ public partial class InputManager : Node2D
 			}
 		}
 
+		if (Input.IsKeyPressed(Key.R))
+		{
+    		_grid.MirrorAndShift();
+		}
+		
 		if (Input.IsKeyPressed(Key.Key1))
 		{
 			// create the walker pattern at mouse position
@@ -104,21 +109,7 @@ public partial class InputManager : Node2D
 		{
 			const bool f = false; //too easier read the pattern in the grid
 		
-			// create a Gosper's glider gun at mouse position
-			var gosperCells =  new[,]
-			{
-				{f 	  , f   , f , f	, f	, f	, f	, f , f , f , f   , f   , f   , f   , f   , f   , f   , f    , f , f , f   , f   , f   , f , true, f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
-				{f 	  , f   , f , f	, f	, f	, f	, f , f , f , f   , f   , f   , f   , f   , f   , f   , f    , f , f , f   , f   , true, f , true, f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
-				{f 	  , f   , f , f	, f	, f	, f	, f , f , f , f   , f   , true, true, f   , f   , f   , f    , f , f , true, true, f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
-				{f 	  , f   , f , f	, f	, f	, f	, f , f , f , f   , true, f   , f   , f   , true, f   , f    , f , f , true, true, f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , true, true },
-				{true , true, f , f	, f	, f	, f	, f , f , f , true, f   , f   , f   , f   , f   , true, f    , f , f , true, true, f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , true, true },
-				{true , true, f , f	, f	, f	, f	, f , f , f , true, f   , f   , f   , true, f   , true, true , f , f , f   , f   , true, f , true, f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
-				{f    , f 	, f , f	, f	, f	, f	, f , f , f , true, f   , f   , f   , f   , f   , true, f    , f , f , f   , f   , f   , f , true, f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
-				{f    , f 	, f , f	, f	, f	, f	, f , f , f , f   , true, f   , f   , f   , true, f   , f    , f , f , f   , f   , f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , f   , f    },
-				{f    , f 	, f , f	, f	, f	, f	, f , f , f , f   , f   , true, true, f   , f   , f   , f    , f , f , f   , f   , f   , f , f   , f  , f	, f	, f	, f	, f	, f , f , f , f   , f    }
-			};
-
-			var rotated = MatrixManipulation.RotateMatrix90(gosperCells);
+			var rotated = MatrixManipulation.RotateMatrix90(PatternCreator.Pattern.GosperGun);
 			
 			var gosperGliderGun = new PatternCreator.Pattern(36, 9, rotated);
 			_grid.DrawPattern(gosperGliderGun);

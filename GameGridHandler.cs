@@ -15,16 +15,14 @@ public partial class GameGridHandler : Node2D
 	public override void _Ready()
 	{  
 		var gridSize = GetViewportRect().Size;
-		
-		_grid = new Grid(_matrixManipulation,gridSize);
+		_patternCreator = new PatternCreator();
+		_grid = new Grid(_matrixManipulation, gridSize);
 		_controller = new GridController(_grid);
 		_inputManager = new InputManager(_grid);
 		
 		AddChild(_grid);
 		AddChild(_controller);
 		AddChild(_inputManager);
-		
-		_patternCreator = new PatternCreator();
 	}
 	
 	public override void _Process(double delta)
