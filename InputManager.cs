@@ -43,6 +43,17 @@ namespace GameOfLife
 
             if (Input.IsKeyPressed(Key.Up))
             {
+                //hide child named 'TextNode'
+                var x = this.GetChildren();
+                
+                NodePath path = "../RichTextLabel";
+                var childNode = GetNode<RichTextLabel>(path);
+                childNode.Visible = false;
+                GD.Print(childNode.Name);
+                
+                
+                //hildNode.Visible = false;
+                
                 DecreaseTickRate();
             }
 

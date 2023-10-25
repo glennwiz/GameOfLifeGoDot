@@ -58,82 +58,49 @@ public partial class Grid: Node2D
 			for (var j = 0; j < GridHeight; j++)
 			{
 				var cellColor = Colors.Black;
-					
+				bool isAlive = false;
+
+				// START PATTERN
+				if ((i is >= 40 and <= 42 && j == 40) 
+					    || (i == 40 && j is >= 40 and <= 42) 
+					    || (i == 42 && j is >= 40 and <= 42))
+				{
+					cellColor = Colors.White;
+					isAlive = true;
+				}
+			
+				
+				if ((i == 55 && (j == 37 || j == 38 || j == 39 || j == 51 || j == 52 || j == 53))
+				    || (i == 58 && (j == 36 || j == 50 || j == 54))
+				    || (i == 59 && (j == 36 || j == 50 || j == 54))
+				    || (i == 60 && (j == 37 || j == 38 || j == 39 || j == 51 || j == 52 || j == 53))
+				    || (i == 61 && (j == 36 || j == 50 || j == 54))
+				    || (i == 62 && (j == 36 || j == 50 || j == 54))
+				    || (i == 65 && (j == 37 || j == 38 || j == 39 || j == 51 || j == 52 || j == 53)))
+				{
+					cellColor = Colors.White;
+					isAlive = true;
+				}
+
+				if ((i == 30 && (j == 57 || j == 58 || j == 59 || j == 61 || j == 62 || j == 63))
+				    || (i == 33 && (j == 56 || j == 60 || j == 64))
+				    || (i == 34 && (j == 56 || j == 60 || j == 64))
+				    || (i == 35 && (j == 57 || j == 58 || j == 59 || j == 61 || j == 62 || j == 63))
+				    || (i == 36 && (j == 56 || j == 60 || j == 64))
+				    || (i == 37 && (j == 56 || j == 60 || j == 64))
+				    || (i == 40 && (j == 57 || j == 58 || j == 59 || j == 61 || j == 62 || j == 63)))
+				{
+					cellColor = Colors.White;
+					isAlive = true;
+				}
+
+				
 				initialState[i, j] = new Cell
 				{
 					Color = cellColor,
-					IsAlive = false,
+					IsAlive = isAlive,
 					Position = new Vector2(i, j)
 				};
-				
-				if(i == 40 && j == 40 )
-				{
-					initialState[i, j] = new Cell
-					{
-						Color = Colors.White,
-						IsAlive = true,
-						Position = new Vector2(i, j)
-					};
-				}
-				
-				if(i == 41 && j == 40 )
-				{
-					initialState[i, j] = new Cell
-					{
-						Color = Colors.White,
-						IsAlive = true,
-						Position = new Vector2(i, j)
-					};
-				}
-				
-				if(i == 42 && j == 40 )
-				{
-					initialState[i, j] = new Cell
-					{
-						Color = Colors.White,
-						IsAlive = true,
-						Position = new Vector2(i, j)
-					};
-				}
-				
-				if(i == 40 && j == 41 )
-				{
-					initialState[i, j] = new Cell
-					{
-						Color = Colors.White,
-						IsAlive = true,
-						Position = new Vector2(i, j)
-					};
-				}
-				
-				if(i == 42 && j == 41 )
-				{
-					initialState[i, j] = new Cell
-					{
-						Color = Colors.White,
-						IsAlive = true,
-						Position = new Vector2(i, j)
-					};
-				}
-				if(i == 40 && j == 42 )
-				{
-					initialState[i, j] = new Cell
-					{
-						Color = Colors.White,
-						IsAlive = true,
-						Position = new Vector2(i, j)
-					};
-				}
-				
-				if(i == 42 && j == 42 )
-				{
-					initialState[i, j] = new Cell
-					{
-						Color = Colors.White,
-						IsAlive = true,
-						Position = new Vector2(i, j)
-					};
-				}
 			}
 		}
 		
@@ -142,8 +109,6 @@ public partial class Grid: Node2D
 		initialState = PatternCreator.CreatePattern(PatternCreator.Pattern.Star, initialState);
 		
 		GridCells.Add(initialState);
-		
-		
 	}
 	
 	public int CountLiveNeighbors(Cell[,] grid, int x, int y)
@@ -152,10 +117,12 @@ public partial class Grid: Node2D
 		var width = grid.GetLength(0);
 		var height = grid.GetLength(1);
 
-		// Define offsets for all 8 neighbors
+		//offsets for all 8 neighbors, cell at center
 		(int, int)[] offsets =
 		{
-			(-1,-1), (0, -1), (1, -1), (-1, 0), ( 1,  0), (-1, 1), (0, 1), (1, 1)
+			(-1,-1), (0,-1), (1, -1), 
+			(-1, 0),         (1,  0), 
+			(-1, 1), (0, 1), (1,  1)
 		};
 
 		foreach (var offset in offsets)

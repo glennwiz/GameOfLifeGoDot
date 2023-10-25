@@ -23,6 +23,17 @@ public partial class GameGridHandler : Node2D
 		AddChild(_grid);
 		AddChild(_controller);
 		AddChild(_inputManager);
+		
+		PrintAllNodes(this);	
+	}
+	
+	void PrintAllNodes(Node node)
+	{
+		GD.Print(node.Name);
+		foreach (Node child in node.GetChildren())
+		{
+			PrintAllNodes(child);
+		}
 	}
 	
 	public override void _Process(double delta)
