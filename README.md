@@ -1,6 +1,9 @@
 # GameOfLifeGoDot
 
 RnD Godot C# project
+![image](https://github.com/glennwiz/GameOfLifeGoDot/assets/195927/c5d211d6-dd65-49b0-93fc-b9432844267d)
+
+
 ![iter3](https://github.com/glennwiz/GameOfLifeGoDot/assets/195927/2078a06c-9e8e-414c-8037-61b2e280593e)
 
 
