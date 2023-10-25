@@ -62,7 +62,7 @@ namespace GameOfLife
                 IncreaseTickRate();
             }
 
-            if (Input.IsKeyPressed(Key.R))
+            if (Input.IsKeyPressed(Key.T))
             {
                 HandleMirrorAndShift();
             }
@@ -75,6 +75,24 @@ namespace GameOfLife
             if (Input.IsKeyPressed(Key.Key2))
             {
                 DrawGosperGliderGunPattern();
+            }
+
+            if (Input.IsKeyPressed(Key.Key3))
+            {
+                DrawPulsarPattern();
+            }
+            
+            if (Input.IsKeyPressed(Key.Key4))
+            {
+                var p = new PatternCreator.Pattern(PatternCreator.Pattern.CustomPattern);
+                _grid.DrawPattern(p);
+                
+            }
+            
+            if (Input.IsKeyPressed(Key.R))
+            {
+                var randomPattern = PatternCreator.CreateRandomPattern(30, 30);
+                _grid.DrawPattern(randomPattern);
             }
 
             if (Input.IsKeyPressed(Key.Right))
@@ -146,15 +164,21 @@ namespace GameOfLife
                 {true , true , true}
             };
 
-            var glider = new PatternCreator.Pattern(3, 3, gliderCells);
+            var glider = new PatternCreator.Pattern(gliderCells);
             _grid.DrawPattern(glider);
         }
 
         private void DrawGosperGliderGunPattern()
         {
-            const bool f = false;
             var rotated = MatrixManipulation.RotateMatrix90(PatternCreator.Pattern.GosperGun);
-            var gosperGliderGun = new PatternCreator.Pattern(36, 9, rotated);
+            var gosperGliderGun = new PatternCreator.Pattern(rotated);
+            _grid.DrawPattern(gosperGliderGun);
+        }
+        
+        private void DrawPulsarPattern()
+        {
+            var rotated = MatrixManipulation.RotateMatrix90(PatternCreator.Pattern.Pulsar);
+            var gosperGliderGun = new PatternCreator.Pattern(rotated);
             _grid.DrawPattern(gosperGliderGun);
         }
     }

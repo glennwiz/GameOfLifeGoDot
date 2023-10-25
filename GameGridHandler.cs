@@ -30,7 +30,7 @@ public partial class GameGridHandler : Node2D
 	void PrintAllNodes(Node node)
 	{
 		GD.Print(node.Name);
-		foreach (Node child in node.GetChildren())
+		foreach (var child in node.GetChildren())
 		{
 			PrintAllNodes(child);
 		}
@@ -76,6 +76,13 @@ public partial class GameGridHandler : Node2D
 							// Use the cell's color when drawing
 							DrawBox(x, y, currentGridState[x, y].Color);
 						}
+					}
+
+					if (_grid.DrawCopyBox)
+					{
+						//draw a red square around the mouse position
+						var mousePosition = GetGlobalMousePosition();
+						DrawRect(new Rect2(mousePosition, new Vector2(80, 80)), Colors.Red, false);
 					}
 				}
 			}

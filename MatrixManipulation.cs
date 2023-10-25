@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Godot;
+﻿using Godot;
 
 namespace GameOfLife;
 
@@ -24,14 +23,14 @@ public class MatrixManipulation
 	
     public void ClearGrid(Grid grid)
     {
-        foreach (var g in grid.GridCells)
+        foreach (var cells in grid.GridCells)
         {
             // Clear all cells 
-            for (var x = 0; x <g.GetLength(0) ; x++)
+            for (var x = 0; x <cells.GetLength(0) ; x++)
             {
-                for (var y = 0; y < g.GetLength(1); y++)
+                for (var y = 0; y < cells.GetLength(1); y++)
                 {
-                    g[x, y] = new Cell
+                    cells[x, y] = new Cell
                     {
                         Color = Colors.Black,
                         IsAlive = false,

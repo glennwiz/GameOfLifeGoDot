@@ -24,6 +24,7 @@ public partial class Grid: Node2D
 	public List<Cell[,]> GridCells { get; set; } = new(); 
 	public int BoxSize { get; set; } = 10;
 	public bool DebugState { get; set; } = true;
+	public bool DrawCopyBox { get; set; } = false;
 
 	// Default speed value
 	private const float DefaultUpdateTickRate = 0.5f;
@@ -42,9 +43,8 @@ public partial class Grid: Node2D
 
 	public void MirrorAndShift()
 	{
-		// Implement  logic to mirror the grid and shift it 3px to the right.
+		DrawCopyBox = !DrawCopyBox;
 	}
-
 
 	private void InitGrid()
 	{
@@ -58,7 +58,7 @@ public partial class Grid: Node2D
 			for (var j = 0; j < GridHeight; j++)
 			{
 				var cellColor = Colors.Black;
-				bool isAlive = false;
+				var isAlive = false;
 
 				// START PATTERN
 				if ((i is >= 40 and <= 42 && j == 40) 
@@ -169,8 +169,8 @@ public partial class Grid: Node2D
 		var patternHeight = pattern.Height;
 		var patternCells = pattern.Cells;
 		var mousePosition = GetGlobalMousePosition();
-		var mousePositionX = (int) (mousePosition.X / BoxSize);
-		var mousePositionY = (int) (mousePosition.Y / BoxSize);
+		var mousePositionX = (int) (mousePosition.X / BoxSize) - patternWidth / 2;
+		var mousePositionY = (int) (mousePosition.Y / BoxSize) - patternHeight / 2;
 		
 		for (var i = 0; i < patternWidth; i++)
 		{

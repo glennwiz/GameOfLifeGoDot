@@ -1,21 +1,26 @@
-﻿using Godot;
+﻿using System;
+using Godot;
 
 namespace GameOfLife;
 
 public partial class PatternCreator : Node2D
 {
+    static Random _random = new Random();
+    
     public class Pattern
     {
         public int Width { get; } 
         public int Height { get; } 
         public bool[,] Cells { get; }
-
-        public Pattern(int width, int height, bool[,] cells)
+        
+        
+        public Pattern(bool[,] cells)
         {
-            Width = width;
-            Height = height;
+            Width = cells.GetLength(0);
+            Height = cells.GetLength(1);
             Cells = cells;
         }
+        
         public static bool[,] GosperGun => gosperCells;
         public static bool f = false;
         // create a Gosper's glider gun at mouse position
@@ -38,28 +43,64 @@ public partial class PatternCreator : Node2D
             {true}, {   f}, {   f}, {f}, {f}, {f}, {f}, {f}, {f}, {   f}, {   f}, {true},
             {true}, {true}, {true}, {f}, {f}, {f}, {f}, {f}, {f}, {true}, {true}, {true}
         };
+        
+        public static bool[,] Pulsar => pulsar;
+        private static readonly bool[,] pulsar = {
+            {f, f, true, true, true, f, f, f, true, true, true, f, f},
+            {f, true, f, f, f, true, f, true, f, f, f, true, f},
+            {f, true, f, f, f, true, f, true, f, f, f, true, f},
+            {f, true, f, f, f, true, f, true, f, f, f, true, f},
+            {f, f, true, true, true, f, f, f, true, true, true, f, f},
+            {f, f, f, true, f, f, f, f, f, true, f, f, f},
+            {f, f, f, f, f, f, f, f, f, f, f, f, f},
+            {f, f, f, true, f, f, f, f, f, true, f, f, f},
+            {f, f, true, true, true, f, f, f, true, true, true, f, f},
+            {f, true, f, f, f, true, f, true, f, f, f, true, f},
+            {f, true, f, f, f, true, f, true, f, f, f, true, f},
+            {f, true, f, f, f, true, f, true, f, f, f, true, f},
+            {f, f, true, true, true, f, f, f, true, true, true, f, f}
+        };
+        
+        public static bool[,] CustomPattern => customPattern;
+        private static readonly bool[,] customPattern = {
+            {f, f, f, f, f, f, true, true, true, true, true, f, f, f, f, f},
+            {f, f, f, f, f, true, f, f, f, f, true, true, f, f, f, f},
+            {f, f, f, f, f, true, f, f, f, f, true, true, f, f, f, f},
+            {f, f, f, f, f, true, f, f, f, f, true, true, f, f, f, f},
+            {f, f, f, f, f, f, true, true, true, true, true, f, f, f, f, f},
+            {f, f, f, f, true, true, f, f, f, f, true, true, true, f, f, f},
+            {f, f, f, f, true, true, f, f, f, f, true, true, true, f, f, f},
+            {f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f},
+            {f, f, f, f, true, true, f, f, f, f, true, true, true, f, f, f},
+            {f, f, f, f, true, true, f, f, f, f, true, true, true, f, f, f},
+            {f, f, f, f, f, f, true, true, true, true, true, f, f, f, f, f},
+            {f, f, f, f, f, true, f, f, f, f, true, true, f, f, f, f},
+            {f, f, f, f, f, true, f, f, f, f, true, true, f, f, f, f},
+            {f, f, f, f, f, true, f, f, f, f, true, true, f, f, f, f},
+            {f, f, f, f, f, f, true, true, true, true, true, f, f, f, f, f}
+        };
     }
     
     public static Cell[,] CreatePattern(bool[,] star, Cell[,] initialState)
     {
-        var pattern = new Pattern(star.GetLength(0), star.GetLength(1), star);
+        var pattern = new Pattern(star);
 
-        int patternWidth = pattern.Width;
-        int patternHeight = pattern.Height;
+        var patternWidth = pattern.Width;
+        var patternHeight = pattern.Height;
 
-        int initialWidth = initialState.GetLength(0);
-        int initialHeight = initialState.GetLength(1);
+        var initialWidth = initialState.GetLength(0);
+        var initialHeight = initialState.GetLength(1);
 
-        int midWidth = initialWidth / 2;
-        int midHeight = initialHeight / 2;
+        var midWidth = initialWidth / 2;
+        var midHeight = initialHeight / 2;
 
-        for (int i = 0; i < patternWidth; i++)
+        for (var i = 0; i < patternWidth; i++)
         {
-            for (int j = 0; j < patternHeight; j++)
+            for (var j = 0; j < patternHeight; j++)
             {
                 // Wrap pattern onto initialState from the middle of the initialState
-                int x = (midWidth - patternWidth / 2 + i + initialWidth) % initialWidth;
-                int y = (midHeight - patternHeight / 2 + j + initialHeight) % initialHeight;
+                var x = (midWidth - patternWidth / 2 + i + initialWidth) % initialWidth;
+                var y = (midHeight - patternHeight / 2 + j + initialHeight) % initialHeight;
 
                 // Modify initialState according to pattern
                 initialState[x, y] = pattern.Cells[i, j] ? new Cell() : initialState[x, y];
@@ -68,5 +109,21 @@ public partial class PatternCreator : Node2D
 
         return initialState;
     }
-    
+
+    public static Pattern CreateRandomPattern(int x, int y)
+    {
+        var patternWidth = x;
+        var patternHeight = y;
+        var patternCells = new bool[patternWidth, patternHeight];
+
+        for (var i = 0; i < patternWidth; i++)
+        {
+            for (var j = 0; j < patternHeight; j++)
+            {
+                patternCells[i, j] = _random.Next(0, 2) == 1;
+            }
+        }
+
+        return new Pattern(patternCells);
+    }
 }
