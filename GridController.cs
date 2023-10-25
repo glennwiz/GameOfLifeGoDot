@@ -11,54 +11,65 @@ public partial class GridController : Node2D
         _grid = grid;
     }
 
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
     public void GridProcess(double delta)
     {
+        PerformGridProcess(delta);
+    }
+    
+    private void PerformGridProcess(double delta)
+    {
         if (_grid.IsPaused) return;
-		
         _grid.TimeElapsed += delta;
+
         if (_grid.TimeElapsed >= _grid.UpdateTickRate)
         {
-            _grid.GridCells[_grid.CurrentStateIndex] = ApplyConwaysRules(_grid.GridCells[_grid.CurrentStateIndex]);
-            _grid.SaveState();
+            PerformGridUpdate();
             _grid.TimeElapsed = 0.0;
         }
     }
     
+    private void PerformGridUpdate()
+    {
+        _grid.GridCells[_grid.CurrentStateIndex] = ApplyConwaysRules(_grid.GridCells[_grid.CurrentStateIndex]);
+        _grid.SaveState();
+    }
+
     private Cell[,] ApplyConwaysRules(Cell[,] currentGrid)
     { 
         var newGrid = new Cell[_grid.GridWidth, _grid.GridHeight];
+        
+        ProcessGridRules(currentGrid, newGrid);
+        return newGrid;
+    }
 
+    private void ProcessGridRules(Cell[,] currentGrid, Cell[,] newGrid)
+    {
         for (var x = 0; x < _grid.GridWidth; x++)
         {
             for (var y = 0; y < _grid.GridHeight; y++)
             {
-                var liveNeighbors = _grid.CountLiveNeighbors(currentGrid, x, y);
-                var cellColor = _grid.GetCellColor(liveNeighbors);
-
-                if (currentGrid[x, y]?.IsAlive ?? false)
-                {
-                    newGrid[x, y] = new Cell
-                    {
-                        LiveNeighbors = liveNeighbors,
-                        Color = cellColor,
-                        IsAlive = liveNeighbors == 2 || liveNeighbors == 3,
-                        Position = new Vector2(x, y)
-                    };
-                }
-                else
-                {
-                    newGrid[x, y] = new Cell
-                    {
-                        LiveNeighbors = liveNeighbors,
-                        Color = cellColor,
-                        IsAlive = liveNeighbors == 3,
-                        Position = new Vector2(x, y)
-                    };
-                }
+                newGrid[x, y] = GetNewCell(currentGrid, x, y);
             }
         }
+    }
 
-        return newGrid;
+    private Cell GetNewCell(Cell[,] currentGrid, int x, int y)
+    {
+        var liveNeighbors = _grid.CountLiveNeighbors(currentGrid, x, y);
+        Cell newCell = InitializeCell(liveNeighbors, currentGrid[x, y]?.IsAlive ?? false, x, y);
+        return newCell;
+    }
+    
+    private Cell InitializeCell(int liveNeighbors, bool isAlive, int x, int y)
+    {
+        var cellColor = _grid.GetCellColor(liveNeighbors);
+        
+        return new Cell
+        {
+           LiveNeighbors = liveNeighbors,
+           Color = cellColor,
+           IsAlive = isAlive ? (liveNeighbors == 2 || liveNeighbors == 3) : (liveNeighbors == 3),
+           Position = new Vector2(x, y)
+        };
     }
 }
