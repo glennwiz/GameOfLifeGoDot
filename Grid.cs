@@ -60,7 +60,7 @@ public partial class Grid: Node2D
 				var cellColor = Colors.Black;
 				var isAlive = false;
 
-				// START PATTERN
+				// START PATTERNS
 				if ((i is >= 40 and <= 42 && j == 40) 
 					    || (i == 40 && j is >= 40 and <= 42) 
 					    || (i == 42 && j is >= 40 and <= 42))
@@ -69,26 +69,25 @@ public partial class Grid: Node2D
 					isAlive = true;
 				}
 			
-				
-				if ((i == 55 && (j == 37 || j == 38 || j == 39 || j == 51 || j == 52 || j == 53))
-				    || (i == 58 && (j == 36 || j == 50 || j == 54))
-				    || (i == 59 && (j == 36 || j == 50 || j == 54))
-				    || (i == 60 && (j == 37 || j == 38 || j == 39 || j == 51 || j == 52 || j == 53))
-				    || (i == 61 && (j == 36 || j == 50 || j == 54))
-				    || (i == 62 && (j == 36 || j == 50 || j == 54))
-				    || (i == 65 && (j == 37 || j == 38 || j == 39 || j == 51 || j == 52 || j == 53)))
+				if ((i == 55 && j is 37 or 38 or 39 or 51 or 52 or 53)
+				    || (i == 58 && j is 36 or 50 or 54)
+				    || (i == 59 && j is 36 or 50 or 54)
+				    || (i == 60 && j is 37 or 38 or 39 or 51 or 52 or 53)
+				    || (i == 61 && j is 36 or 50 or 54)
+				    || (i == 62 && j is 36 or 50 or 54)
+				    || (i == 65 && j is 37 or 38 or 39 or 51 or 52 or 53))
 				{
 					cellColor = Colors.White;
 					isAlive = true;
 				}
 
-				if ((i == 30 && (j == 57 || j == 58 || j == 59 || j == 61 || j == 62 || j == 63))
-				    || (i == 33 && (j == 56 || j == 60 || j == 64))
-				    || (i == 34 && (j == 56 || j == 60 || j == 64))
-				    || (i == 35 && (j == 57 || j == 58 || j == 59 || j == 61 || j == 62 || j == 63))
-				    || (i == 36 && (j == 56 || j == 60 || j == 64))
-				    || (i == 37 && (j == 56 || j == 60 || j == 64))
-				    || (i == 40 && (j == 57 || j == 58 || j == 59 || j == 61 || j == 62 || j == 63)))
+				if ((i == 30 && j is 57 or 58 or 59 or 61 or 62 or 63)
+				    || (i == 33 && j is 56 or 60 or 64)
+				    || (i == 34 && j is 56 or 60 or 64)
+				    || (i == 35 && j is 57 or 58 or 59 or 61 or 62 or 63)
+				    || (i == 36 && j is 56 or 60 or 64)
+				    || (i == 37 && j is 56 or 60 or 64)
+				    || (i == 40 && j is 57 or 58 or 59 or 61 or 62 or 63))
 				{
 					cellColor = Colors.White;
 					isAlive = true;
