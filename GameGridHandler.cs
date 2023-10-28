@@ -32,7 +32,7 @@ public partial class GameGridHandler : Node2D
 
     public override void _Draw()
     {
-        if (_grid.CurrentStateIndex < 0 || _grid.CurrentStateIndex >= _grid.GridCells.Count)
+        if (_grid.CurrentStateIndex < 0 || _grid.CurrentStateIndex >= _grid.ListOfCellArrayStates.Count)
         {
             return;
         }
@@ -86,7 +86,7 @@ public partial class GameGridHandler : Node2D
 
     private void DrawCells()
     {
-        var currentGridState = _grid.GridCells[_grid.CurrentStateIndex];
+        var currentGridState = _grid.ListOfCellArrayStates[_grid.CurrentStateIndex];
 
         for (var x = 0; x < _grid.GridWidth; x++)
         {

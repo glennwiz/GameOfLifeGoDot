@@ -21,7 +21,8 @@ public partial class Grid: Node2D
 	public bool IsPaused { get; set; }
 	public double TimeElapsed { get; set; }
 	public float UpdateTickRate { get; set; } = 0.5f;
-	public List<Cell[,]> GridCells { get; set; } = new(); 
+	public bool IsDoomed { get; set; }
+	public List<Cell[,]> ListOfCellArrayStates { get; set; } = new(); 
 	public int BoxSize { get; set; } = 10;
 	public bool DebugState { get; set; } = true;
 	public bool DrawCopyBox { get; set; } = false;
@@ -107,7 +108,7 @@ public partial class Grid: Node2D
 		var pattern = new PatternCreator();
 		initialState = PatternCreator.CreatePattern(PatternCreator.Pattern.Star, initialState);
 		
-		GridCells.Add(initialState);
+		ListOfCellArrayStates.Add(initialState);
 	}
 	
 	public int CountLiveNeighbors(Cell[,] grid, int x, int y)
@@ -140,14 +141,16 @@ public partial class Grid: Node2D
 	{
 		CurrentStateIndex++;
 		
-		if (CurrentStateIndex >= GridCells.Count)
+		if (CurrentStateIndex >= ListOfCellArrayStates.Count)
 		{
-			CurrentStateIndex = GridCells.Count - 1;
+			CurrentStateIndex = ListOfCellArrayStates.Count - 1;
 		}
 	}
 
 	public void Rewind()
 	{
+		IsDoomed = true;
+		
 		CurrentStateIndex--;
 		
 		if (CurrentStateIndex < 0)
@@ -163,7 +166,7 @@ public partial class Grid: Node2D
 
 	public void DrawPattern(PatternCreator.Pattern pattern)
 	{
-		var currentGridState = GridCells[CurrentStateIndex];
+		var currentGridState = ListOfCellArrayStates[CurrentStateIndex];
 		var patternWidth = pattern.Width;
 		var patternHeight = pattern.Height;
 		var patternCells = pattern.Cells;
@@ -211,7 +214,7 @@ public partial class Grid: Node2D
 			return;
 		}
 
-		var currentGridState = GridCells[CurrentStateIndex];
+		var currentGridState = ListOfCellArrayStates[CurrentStateIndex];
 		
 		if(currentGridState[x, y] == null)
 		{
@@ -231,15 +234,15 @@ public partial class Grid: Node2D
 	{
 		if(IsPaused) return;
 		
-		var currentGridState = GridCells[CurrentStateIndex];
+		var currentGridState = ListOfCellArrayStates[CurrentStateIndex];
 		var newGridState = (Cell[,]) currentGridState.Clone();
-		GridCells.Add(newGridState);
+		ListOfCellArrayStates.Add(newGridState);
 		CurrentStateIndex++;
 
 		// Optionally, limit the history to the last 100 states
-		if (GridCells.Count <= 100) return;
+		if (ListOfCellArrayStates.Count <= 100) return;
 		
-		GridCells.RemoveAt(0);
+		ListOfCellArrayStates.RemoveAt(0);
 		CurrentStateIndex--;
 	}
 

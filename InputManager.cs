@@ -28,7 +28,7 @@ namespace GameOfLife
 
             if (_grid.IsPaused)
             {
-                HandleRewindStepForward();
+                HandleHistoryStepping();
             }
                 
             if (Input.IsKeyPressed(Key.S))
@@ -43,16 +43,10 @@ namespace GameOfLife
 
             if (Input.IsKeyPressed(Key.Up))
             {
-                //hide child named 'TextNode'
-                var x = this.GetChildren();
-                
                 NodePath path = "../RichTextLabel";
                 var childNode = GetNode<RichTextLabel>(path);
                 childNode.Visible = false;
                 GD.Print(childNode.Name);
-                
-                
-                //hildNode.Visible = false;
                 
                 DecreaseTickRate();
             }
@@ -129,7 +123,7 @@ namespace GameOfLife
         }
 
         private void TogglePause() => _grid.IsPaused = !_grid.IsPaused;
-        private void HandleRewindStepForward()
+        private void HandleHistoryStepping()
         {
             if (Input.IsKeyPressed(Key.Left)) _grid.Rewind();
             if (Input.IsKeyPressed(Key.Right)) _grid.StepForward();
@@ -170,6 +164,8 @@ namespace GameOfLife
 
         private void DrawGosperGliderGunPattern()
         {
+            //I think i wold like a bool to check if we should rotate it or not, may be have a button to flip tins bool?
+            
             var rotated = MatrixManipulation.RotateMatrix90(PatternCreator.Pattern.GosperGun);
             var gosperGliderGun = new PatternCreator.Pattern(rotated);
             _grid.DrawPattern(gosperGliderGun);

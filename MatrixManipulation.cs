@@ -23,7 +23,7 @@ public class MatrixManipulation
 	
     public void ClearGrid(Grid grid)
     {
-        foreach (var cells in grid.GridCells)
+        foreach (var cells in grid.ListOfCellArrayStates)
         {
             // Clear all cells 
             for (var x = 0; x <cells.GetLength(0) ; x++)
