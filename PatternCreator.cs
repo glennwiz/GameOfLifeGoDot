@@ -46,6 +46,15 @@ public partial class PatternCreator : Node2D
         
         public static bool[,] Pulsar => pulsar;
         private static readonly bool[,] pulsar = {
+            {f, f, f, f, true, true, true, f, f, f, f, f, f},
+            {f, f, f, true, f, f, f, true, f, f, f, f, f},
+            {f, f, f, f, f, f, f, f, f, f, f, f, f},
+            {f, f, f, true, f, f, f, true, f, f, f, f, f},
+            {f, f, f, f, true, true, true, f, f, f, f, f, f},
+            
+        };
+        public static bool[,] Random1 => random1;
+        private static readonly bool[,] random1 = {
             {f, f, true, true, true, f, f, f, true, true, true, f, f},
             {f, true, f, f, f, true, f, true, f, f, f, true, f},
             {f, true, f, f, f, true, f, true, f, f, f, true, f},
