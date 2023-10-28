@@ -23,6 +23,14 @@ namespace GameOfLife
         {
             if (Input.IsKeyPressed(Key.Space))
             {
+                if (_grid.ResetHigherGridArray)
+                {
+                    //we need to flush the higher list of states and reset the current state index
+                    var currentStateIndex = _grid.CurrentStateIndex;
+                    //now whe should clear out all the states that are higher than the current state index
+                    _grid.ListOfCellArrayStates.RemoveRange(currentStateIndex + 1, _grid.ListOfCellArrayStates.Count - currentStateIndex - 1);
+                }
+                
                 TogglePause();
             }
 

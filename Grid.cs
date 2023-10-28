@@ -21,7 +21,7 @@ public partial class Grid: Node2D
 	public bool IsPaused { get; set; }
 	public double TimeElapsed { get; set; }
 	public float UpdateTickRate { get; set; } = 0.5f;
-	public bool IsDoomed { get; set; }
+	public bool ResetHigherGridArray { get; set; }
 	public List<Cell[,]> ListOfCellArrayStates { get; set; } = new(); 
 	public int BoxSize { get; set; } = 10;
 	public bool DebugState { get; set; } = true;
@@ -149,7 +149,7 @@ public partial class Grid: Node2D
 
 	public void Rewind()
 	{
-		IsDoomed = true;
+		ResetHigherGridArray = true;
 		
 		CurrentStateIndex--;
 		
