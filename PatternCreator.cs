@@ -51,8 +51,8 @@ public partial class PatternCreator : Node2D
             {f, f, f, f, f, f, f, f, f, f, f, f, f},
             {f, f, f, true, f, f, f, true, f, f, f, f, f},
             {f, f, f, f, true, true, true, f, f, f, f, f, f},
-            
         };
+        
         public static bool[,] Random1 => random1;
         private static readonly bool[,] random1 = {
             {f, f, true, true, true, f, f, f, true, true, true, f, f},
@@ -119,17 +119,17 @@ public partial class PatternCreator : Node2D
         return initialState;
     }
 
-    public static Pattern CreateRandomPattern(int x, int y)
+    public static Pattern CreateRandomPattern(int x, int y, float bias)
     {
         var patternWidth = x;
         var patternHeight = y;
         var patternCells = new bool[patternWidth, patternHeight];
-
+        var _random = new Random();
         for (var i = 0; i < patternWidth; i++)
         {
             for (var j = 0; j < patternHeight; j++)
             {
-                patternCells[i, j] = _random.Next(0, 2) == 1;
+                patternCells[i, j] = _random.NextDouble() < bias;
             }
         }
 

@@ -6,12 +6,13 @@ namespace GameOfLife
     public partial class InputManager : Node2D 
     {
         private readonly Grid _grid;
+        private void TogglePause() => _grid.IsPaused = !_grid.IsPaused;
 
         public InputManager(Grid grid) 
         {
             _grid = grid;
         }
-
+        
         public override void _Input(InputEvent @event) 
         {
             HandleKeyPressEvents();
@@ -28,9 +29,17 @@ namespace GameOfLife
             HandleDownKeyPress();
             HandleTKeyPress();
             HandleNumberKeyPresses();
-            HandleRightKeyPress();
+            HandleRKeyPress();
         }
 
+        private void HandleNumberKeyPresses()
+        {
+            if (Input.IsKeyPressed(Key.Key1)) DrawGliderPattern();
+            if (Input.IsKeyPressed(Key.Key2)) DrawGosperGliderGunPattern();
+            if (Input.IsKeyPressed(Key.Key3)) DrawPulsarPattern();
+            if (Input.IsKeyPressed(Key.Key4)) DrawOwlPattern();
+        }
+        
         private void HandleSpaceKeyPress()
         {
             if (Input.IsKeyPressed(Key.Space)) 
@@ -39,16 +48,8 @@ namespace GameOfLife
                 TogglePause();
             }
         }
-        
-        private void ResetHigherGridArray()
-        {
-            if (!_grid.ResetHigherGridArray) return;
-            
-            var currentStateIndex = _grid.CurrentStateIndex;
-            _grid.ListOfCellArrayStates.RemoveRange(currentStateIndex + 1, _grid.ListOfCellArrayStates.Count - currentStateIndex - 1);
-        }
-        
-        private void TogglePause() => _grid.IsPaused = !_grid.IsPaused;
+
+       
         
         private void HandlePauseDependentKeyPresses()
         {
@@ -86,14 +87,6 @@ namespace GameOfLife
                 DecreaseTickRate();
             }
         }
-
-        private void HideRichTextLabel()
-        {
-            NodePath path = "../RichTextLabel";
-            var childNode = GetNode<RichTextLabel>(path);
-            childNode.Visible = false;
-            GD.Print(childNode.Name);
-        }
         
         private void HandleDownKeyPress()
         {
@@ -113,38 +106,21 @@ namespace GameOfLife
 
         private void HandleMouseClicked()
         {
-            var randomPattern = PatternCreator.CreateRandomPattern(30, 30);
+            var randomPattern = PatternCreator.CreateRandomPattern(30, 30, 0.1f);
             _grid.DrawPattern(randomPattern);
         }
-
-        private void HandleRightKeyPress()
-        {
-            if (!Input.IsKeyPressed(Key.Right)) return;
-            GD.Print("Right");
-        }
         
-        private void HandleNumberKeyPresses()
+        private void DrawOwlPattern()
         {
-            if (Input.IsKeyPressed(Key.Key1)) DrawGliderPattern();
-            if (Input.IsKeyPressed(Key.Key2)) DrawGosperGliderGunPattern();
-            if (Input.IsKeyPressed(Key.Key3)) DrawPulsarPattern();
-            
-            HandleKey4KeyPress();
-        }
-
-        private void HandleKey4KeyPress()
-        {
-            if (!Input.IsKeyPressed(Key.Key4)) return;
-            
-            var p = new PatternCreator.Pattern(PatternCreator.Pattern.CustomPattern);
-            _grid.DrawPattern(p);
+            var pattern = new PatternCreator.Pattern(PatternCreator.Pattern.CustomPattern);
+            _grid.DrawPattern(pattern);
         }
 
         private void HandleRKeyPress()
         {
             if (!Input.IsKeyPressed(Key.R)) return;
             
-            var randomPattern = PatternCreator.CreateRandomPattern(30, 30);
+            var randomPattern = PatternCreator.CreateRandomPattern(30, 30, 0.1f);
             _grid.DrawPattern(randomPattern);
         }
 
@@ -156,14 +132,15 @@ namespace GameOfLife
 
         private void HandleMouseClick(InputEventMouseButton mouseButtonEvent)
         {
-            ProcessMouseRelease(mouseButtonEvent);
             ProcessMousePress(mouseButtonEvent);
+            ProcessMouseRelease(mouseButtonEvent);
         }
 
         private void ProcessMouseRelease(InputEventMouseButton mouseButtonEvent)
         {
             if (mouseButtonEvent.DoubleClick) 
             {
+                GD.Print("!Double click!");
                 _grid.IsMouseDown = false;
                 QueueRedraw();
             }
@@ -222,6 +199,22 @@ namespace GameOfLife
             var rotated = MatrixManipulation.RotateMatrix90(PatternCreator.Pattern.Pulsar);
             var pulsarPattern = new PatternCreator.Pattern(rotated);
             _grid.DrawPattern(pulsarPattern);
+        }
+        
+        private void HideRichTextLabel()
+        {
+            NodePath path = "../RichTextLabel";
+            var childNode = GetNode<RichTextLabel>(path);
+            childNode.Visible = false;
+            GD.Print(childNode.Name);
+        }
+                
+        private void ResetHigherGridArray()
+        {
+            if (!_grid.ResetHigherGridArray) return;
+            
+            var currentStateIndex = _grid.CurrentStateIndex;
+            _grid.ListOfCellArrayStates.RemoveRange(currentStateIndex + 1, _grid.ListOfCellArrayStates.Count - currentStateIndex - 1);
         }
     }
 }

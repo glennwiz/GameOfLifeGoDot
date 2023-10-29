@@ -28,7 +28,7 @@ offset_bottom = 650.0
 unique_name_in_owner = true
 offset_left = 11.0
 offset_top = 13.0
-offset_right = 1000.0
+offset_right = 1040.0
 offset_bottom = 597.0
 text = "Conway's Game of Life
 ---------------------
