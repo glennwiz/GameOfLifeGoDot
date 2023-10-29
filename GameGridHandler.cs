@@ -15,7 +15,7 @@ public partial class GameGridHandler : Node2D
     { 
         InitComponents();
         AddComponentsToScene();
-        PrintAllNodes(this);
+        DebugPrintAllNodes(this);
     }
 
     public override void _Process(double delta)
@@ -41,7 +41,7 @@ public partial class GameGridHandler : Node2D
         DrawDebugLinesIfEnabled();
     }
 
-    public void DrawBox(int x, int y, Color color)
+    private void DrawBox(int x, int y, Color color)
     {
         if (IsOutOfBounds(x, y))
         {
@@ -69,15 +69,7 @@ public partial class GameGridHandler : Node2D
         AddChild(_inputManager);
     }
 
-    private void PrintAllNodes(Node node)
-    {
-        GD.Print(node.Name);
 
-        foreach (Node child in node.GetChildren())
-        {
-            PrintAllNodes(child);
-        }
-    }
 
     private bool IsOutOfBounds(int x, int y)
     {
@@ -137,6 +129,16 @@ public partial class GameGridHandler : Node2D
                 new Vector2(_grid.GridWidth * _grid.BoxSize, y * _grid.BoxSize),
                 new Color(0, 0, 0)
             );
+        }
+    }
+    
+    private void DebugPrintAllNodes(Node node)
+    {
+        GD.Print(node.Name);
+
+        foreach (Node child in node.GetChildren())
+        {
+            DebugPrintAllNodes(child);
         }
     }
 }
