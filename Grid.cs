@@ -71,25 +71,25 @@ public partial class Grid: Node2D
 					isAlive = true;
 				}
 			
-				if ((i == 55 && j is 37 or 38 or 39 or 51 or 52 or 53)
-				    || (i == 58 && j is 36 or 50 or 54)
-				    || (i == 59 && j is 36 or 50 or 54)
-				    || (i == 60 && j is 37 or 38 or 39 or 51 or 52 or 53)
-				    || (i == 61 && j is 36 or 50 or 54)
-				    || (i == 62 && j is 36 or 50 or 54)
-				    || (i == 65 && j is 37 or 38 or 39 or 51 or 52 or 53))
+				if ((i == 75 && j is 37 or 38 or 39 or 51 or 52 or 53)
+				    || (i == 78 && j is 36 or 50 or 54)
+				    || (i == 79 && j is 36 or 50 or 54)
+				    || (i == 80 && j is 37 or 38 or 39 or 51 or 52 or 53)
+				    || (i == 81 && j is 36 or 50 or 54)
+				    || (i == 82 && j is 36 or 50 or 54)
+				    || (i == 85 && j is 37 or 38 or 39 or 51 or 52 or 53))
 				{
 					cellColor = Colors.White;
 					isAlive = true;
 				}
 
-				if ((i == 30 && j is 57 or 58 or 59 or 61 or 62 or 63)
-				    || (i == 33 && j is 56 or 60 or 64)
-				    || (i == 34 && j is 56 or 60 or 64)
-				    || (i == 35 && j is 57 or 58 or 59 or 61 or 62 or 63)
-				    || (i == 36 && j is 56 or 60 or 64)
-				    || (i == 37 && j is 56 or 60 or 64)
-				    || (i == 40 && j is 57 or 58 or 59 or 61 or 62 or 63))
+				if ((i == 50 && j is 57 or 58 or 59 or 61 or 62 or 63)
+				    || (i == 53 && j is 56 or 60 or 64)
+				    || (i == 54 && j is 56 or 60 or 64)
+				    || (i == 55 && j is 57 or 58 or 59 or 61 or 62 or 63)
+				    || (i == 56 && j is 56 or 60 or 64)
+				    || (i == 57 && j is 56 or 60 or 64)
+				    || (i == 60 && j is 57 or 58 or 59 or 61 or 62 or 63))
 				{
 					cellColor = Colors.White;
 					isAlive = true;

@@ -19,6 +19,7 @@ public partial class GridController : Node2D
     private void PerformGridProcess(double delta)
     {
         if (_grid.IsPaused) return;
+        
         _grid.TimeElapsed += delta;
 
         if (_grid.TimeElapsed >= _grid.UpdateTickRate)
