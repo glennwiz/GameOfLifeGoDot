@@ -66,8 +66,6 @@ public partial class InputManager : Node2D
         ResetHigherGridArray();
         TogglePause();
     }
-
-       
         
     private void HandlePauseDependentKeyPresses()
     {
@@ -144,8 +142,7 @@ public partial class InputManager : Node2D
 
     private void HandleMouseInputEvents(InputEvent @event)
     {
-        if (!(@event is InputEventMouseButton mouseButtonEvent)) return;
-        HandleMouseClick(mouseButtonEvent);
+        if (@event is InputEventMouseButton mouseButtonEvent) HandleMouseClick(mouseButtonEvent);
     }
 
     private void HandleMouseClick(InputEventMouseButton mouseButtonEvent)
@@ -166,10 +163,11 @@ public partial class InputManager : Node2D
 
     private void ProcessMousePress(InputEventMouseButton mouseButtonEvent)
     {
-        if (!mouseButtonEvent.Pressed) return;
-            
-        _grid.IsMouseDown = true;
-        ToggleCell(mouseButtonEvent.Position);
+        if (mouseButtonEvent.Pressed)
+        {
+            _grid.IsMouseDown = true;
+            ToggleCell(mouseButtonEvent.Position);
+        }
     }
 
     private void HandleGridReset()

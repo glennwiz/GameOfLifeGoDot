@@ -83,7 +83,6 @@ public partial class GameGridHandler : Node2D
             for (var y = 0; y < _grid.GridHeight; y++)
             {
                 // Check if there is a cell at this position
-                
                 if(x >= currentGridState.GetLength(0) || y >= currentGridState.GetLength(1))
                 {
                     continue;
