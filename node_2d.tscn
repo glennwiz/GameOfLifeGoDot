@@ -29,7 +29,7 @@ unique_name_in_owner = true
 offset_left = 11.0
 offset_top = 13.0
 offset_right = 1040.0
-offset_bottom = 644.0
+offset_bottom = 640.0
 text = "Conway's Game of Life
 ---------------------
 A cellular automaton that simulates the complexities of existence through four basic rules. Observe as cells live, die, and evolve based on their interactions with neighboring cells. Witness emergent phenomena, self-replicating structures, and intricate patterns. A microcosm of life's complexity, governed by simple mathematical principles.
