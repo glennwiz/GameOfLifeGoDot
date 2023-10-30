@@ -56,6 +56,8 @@ public partial class GridController : Node2D
     private Cell GetNewCell(Cell[,] currentGrid, int x, int y)
     {
         var liveNeighbors = _grid.CountLiveNeighbors(currentGrid, x, y);
+        if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return new Cell();
+        
         var newCell = InitializeCell(liveNeighbors, currentGrid[x, y]?.IsAlive ?? false, x, y);
         return newCell;
     }

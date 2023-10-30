@@ -234,6 +234,9 @@ public partial class Grid: Node2D
 		
 		var currentGridState = ListOfCellArrayStates[CurrentStateIndex];
 		var newGridState = (Cell[,]) currentGridState.Clone();
+		
+		var newGrid = new Cell[GridWidth, GridHeight];
+		
 		ListOfCellArrayStates.Add(newGridState);
 		CurrentStateIndex++;
 
