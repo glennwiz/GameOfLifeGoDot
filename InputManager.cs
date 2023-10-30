@@ -35,35 +35,21 @@ public partial class InputManager : Node2D
     private void HandleZoomPress()
     {
         if (Input.IsKeyPressed(Key.C)) ZoomOut();
-        if (Input.IsKeyPressed(Key.Plus)) ZoomIn();
+        if (Input.IsKeyPressed(Key.V)) ZoomIn();
     }
 
     private void ZoomIn()
     {
-        GD.Print("!Zooming in!");
         _grid.BoxSize += 1;
-        QueueRedraw();
+        _grid.GridWidth = (int)GetViewportRect().Size.X / _grid.BoxSize;
+        _grid.GridHeight = (int)GetViewportRect().Size.Y / _grid.BoxSize;
     }
 
     private void ZoomOut()
     {
-        
-     
-        GD.Print("!Zooming out!");
-        
-        //debug
         _grid.BoxSize -= 1;
         _grid.GridWidth = (int)GetViewportRect().Size.X / _grid.BoxSize;
         _grid.GridHeight = (int)GetViewportRect().Size.Y / _grid.BoxSize;
-        
-        GD.PrintT(_grid.GridWidth, _grid.GridHeight, _grid.BoxSize, _grid.CurrentStateIndex, _grid.ListOfCellArrayStates.Count);
-        
-        
-        //!debug
-        
-        
-       
-        QueueRedraw();
     }
 
     private void HandleNumberKeyPresses()
@@ -76,11 +62,9 @@ public partial class InputManager : Node2D
         
     private void HandleSpaceKeyPress()
     {
-        if (Input.IsKeyPressed(Key.Space)) 
-        {
-            ResetHigherGridArray();
-            TogglePause();
-        }
+        if (!Input.IsKeyPressed(Key.Space)) return;
+        ResetHigherGridArray();
+        TogglePause();
     }
 
        
