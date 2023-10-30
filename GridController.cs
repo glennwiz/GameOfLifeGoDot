@@ -49,17 +49,45 @@ public partial class GridController : Node2D
         {
             for (var y = 0; y < _grid.GridHeight; y++)
             {
-                newGrid[x, y] = GetNewCell(currentGrid, x, y);
+                newGrid[x, y] = GetNewCellByConwaysRules(currentGrid, x, y);
             }
         }
     }
 
-    private Cell GetNewCell(Cell[,] currentGrid, int x, int y)
+    private Cell GetNewCellByConwaysRules(Cell[,] currentGrid, int x, int y)
     {
         var liveNeighbors = _grid.CountLiveNeighbors(currentGrid, x, y);
         if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return new Cell();
         
         var newCell = InitializeCell(liveNeighbors, currentGrid[x, y]?.IsAlive ?? false, x, y);
+        return newCell;
+    }
+    
+    private Cell GetNewCellByBriansBrainRules(Cell[,] currentGrid, int x, int y)
+    {
+        var liveNeighbors = _grid.CountLiveNeighbors(currentGrid, x, y); // Assuming this function can count states other than "Alive"
+        if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return new Cell(); // Presuming the Cell constructor initializes to Dead
+
+        var currentCell = currentGrid[x, y];
+        var newCell = new Cell(); // Initialize as Dead by default
+    
+        if (currentCell.State == "Alive") {
+            newCell.State = "Dying";
+            newCell.IsAlive = true;
+        }
+        else if (currentCell.State == "Dying") {
+            newCell.State = "Dead";
+            newCell.IsAlive = false;
+        }
+        else if (currentCell.State == "Dead" && liveNeighbors == 2) {
+            newCell.State = "Alive";
+            newCell.IsAlive = true;
+        }
+        else {
+            newCell.State = currentCell.State;
+            newCell.IsAlive = currentCell.IsAlive;
+        }
+
         return newCell;
     }
     
