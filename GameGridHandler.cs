@@ -69,8 +69,6 @@ public partial class GameGridHandler : Node2D
         AddChild(_inputManager);
     }
 
-
-
     private bool IsOutOfBounds(int x, int y)
     {
         return x < 0 || x >= _grid.GridWidth || y < 0 || y >= _grid.GridHeight;
@@ -85,6 +83,12 @@ public partial class GameGridHandler : Node2D
             for (var y = 0; y < _grid.GridHeight; y++)
             {
                 // Check if there is a cell at this position
+                
+                if(x >= currentGridState.GetLength(0) || y >= currentGridState.GetLength(1))
+                {
+                    continue;
+                }
+                
                 if (currentGridState[x, y] == null)
                 {
                     continue;

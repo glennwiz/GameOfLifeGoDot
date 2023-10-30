@@ -124,7 +124,7 @@ public partial class PatternCreator : Node2D
         var patternWidth = x;
         var patternHeight = y;
         var patternCells = new bool[patternWidth, patternHeight];
-        var _random = new Random();
+        
         for (var i = 0; i < patternWidth; i++)
         {
             for (var j = 0; j < patternHeight; j++)

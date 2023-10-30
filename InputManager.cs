@@ -29,6 +29,27 @@ public partial class InputManager : Node2D
         HandleTKeyPress();
         HandleNumberKeyPresses();
         HandleRKeyPress();
+        HandleZoomPress();
+    }
+
+    private void HandleZoomPress()
+    {
+        if (Input.IsKeyPressed(Key.C)) ZoomOut();
+        if (Input.IsKeyPressed(Key.V)) ZoomIn();
+    }
+
+    private void ZoomIn()
+    {
+        _grid.BoxSize += 1;
+        _grid.GridWidth = (int)GetViewportRect().Size.X / _grid.BoxSize;
+        _grid.GridHeight = (int)GetViewportRect().Size.Y / _grid.BoxSize;
+    }
+
+    private void ZoomOut()
+    {
+        _grid.BoxSize -= 1;
+        _grid.GridWidth = (int)GetViewportRect().Size.X / _grid.BoxSize;
+        _grid.GridHeight = (int)GetViewportRect().Size.Y / _grid.BoxSize;
     }
 
     private void HandleNumberKeyPresses()
@@ -41,11 +62,9 @@ public partial class InputManager : Node2D
         
     private void HandleSpaceKeyPress()
     {
-        if (Input.IsKeyPressed(Key.Space)) 
-        {
-            ResetHigherGridArray();
-            TogglePause();
-        }
+        if (!Input.IsKeyPressed(Key.Space)) return;
+        ResetHigherGridArray();
+        TogglePause();
     }
 
        
@@ -161,8 +180,8 @@ public partial class InputManager : Node2D
     }
 
     private void ToggleDrawDeadCell() => _grid.DrawDeadCell = !_grid.DrawDeadCell;
-    private void DecreaseTickRate() => _grid.UpdateTickRate -= 0.1f;
-    private void IncreaseTickRate() => _grid.UpdateTickRate += 0.1f;
+    private void DecreaseTickRate() => _grid.UpdateTickRate -= 0.02f;
+    private void IncreaseTickRate() => _grid.UpdateTickRate += 0.02f;
     private void HandleMirrorAndShift() => _grid.MirrorAndShift();
 
     private void ToggleCell(Vector2 position)
