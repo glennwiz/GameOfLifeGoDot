@@ -69,8 +69,6 @@ public partial class GameGridHandler : Node2D
         AddChild(_inputManager);
     }
 
-
-
     private bool IsOutOfBounds(int x, int y)
     {
         return x < 0 || x >= _grid.GridWidth || y < 0 || y >= _grid.GridHeight;

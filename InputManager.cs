@@ -29,6 +29,27 @@ public partial class InputManager : Node2D
         HandleTKeyPress();
         HandleNumberKeyPresses();
         HandleRKeyPress();
+        HandleZoomPress();
+    }
+
+    private void HandleZoomPress()
+    {
+        if (Input.IsKeyPressed(Key.C)) ZoomOut();
+        if (Input.IsKeyPressed(Key.Plus)) ZoomIn();
+    }
+
+    private void ZoomIn()
+    {
+        GD.Print("!Zooming in!");
+        _grid.BoxSize += 1;
+        QueueRedraw();
+    }
+
+    private void ZoomOut()
+    {
+        GD.Print("!Zooming out!");
+        _grid.BoxSize -= 1;
+        QueueRedraw();
     }
 
     private void HandleNumberKeyPresses()
@@ -161,8 +182,8 @@ public partial class InputManager : Node2D
     }
 
     private void ToggleDrawDeadCell() => _grid.DrawDeadCell = !_grid.DrawDeadCell;
-    private void DecreaseTickRate() => _grid.UpdateTickRate -= 0.1f;
-    private void IncreaseTickRate() => _grid.UpdateTickRate += 0.1f;
+    private void DecreaseTickRate() => _grid.UpdateTickRate -= 0.02f;
+    private void IncreaseTickRate() => _grid.UpdateTickRate += 0.02f;
     private void HandleMirrorAndShift() => _grid.MirrorAndShift();
 
     private void ToggleCell(Vector2 position)

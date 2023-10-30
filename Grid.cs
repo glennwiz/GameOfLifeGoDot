@@ -53,7 +53,7 @@ public partial class Grid: Node2D
 		var viewportSize = _gridSize;;
 		GridWidth = (int)viewportSize.X / BoxSize;
 		GridHeight = (int)viewportSize.Y / BoxSize;
-		var initialState = new Cell[GridWidth, GridHeight];
+		var emptyCellGrid = new Cell[GridWidth, GridHeight];
 		
 		for (var i = 0; i < GridWidth; i++)
 		{
@@ -96,7 +96,7 @@ public partial class Grid: Node2D
 				}
 
 				
-				initialState[i, j] = new Cell
+				emptyCellGrid[i, j] = new Cell
 				{
 					Color = cellColor,
 					IsAlive = isAlive,
@@ -105,11 +105,8 @@ public partial class Grid: Node2D
 			}
 		}
 		
-		//use pattern to update the initial state
-		var pattern = new PatternCreator();
-		initialState = PatternCreator.CreatePattern(PatternCreator.Pattern.Star, initialState);
-		
-		ListOfCellArrayStates.Add(initialState);
+		var initialCellGrid = PatternCreator.CreatePattern(PatternCreator.Pattern.Star, emptyCellGrid);
+		ListOfCellArrayStates.Add(initialCellGrid);
 	}
 	
 	public int CountLiveNeighbors(Cell[,] grid, int x, int y)
@@ -240,8 +237,8 @@ public partial class Grid: Node2D
 		ListOfCellArrayStates.Add(newGridState);
 		CurrentStateIndex++;
 
-		// Optionally, limit the history to the last 100 states
-		if (ListOfCellArrayStates.Count <= 100) return;
+		// Optionally, limit the history to the last 1000 states
+		if (ListOfCellArrayStates.Count <= 1000) return;
 		
 		ListOfCellArrayStates.RemoveAt(0);
 		CurrentStateIndex--;
