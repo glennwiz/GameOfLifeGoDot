@@ -8,4 +8,5 @@ public class Cell
     public Vector2 Position { get; set; }
     public Color Color { get; set; }
     public int LiveNeighbors { get; set; }
+    public string State { get; set; }
 }

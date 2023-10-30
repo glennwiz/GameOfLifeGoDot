@@ -100,7 +100,9 @@ public partial class Grid: Node2D
 				{
 					Color = cellColor,
 					IsAlive = isAlive,
-					Position = new Vector2(i, j)
+					Position = new Vector2(i, j),
+					State = "Alive"
+					
 				};
 			}
 		}
