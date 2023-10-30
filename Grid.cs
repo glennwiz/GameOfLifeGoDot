@@ -264,4 +264,9 @@ public partial class Grid: Node2D
 		var cellColor = colorMap.ContainsKey(liveNeighbors) ? colorMap[liveNeighbors] : Colors.Gray;
 		return cellColor;
 	}
+
+	public int CountElectronHeadNeighbors(Cell[,] currentGrid, int i, int i1)
+	{
+		throw new NotImplementedException();
+	}
 }
