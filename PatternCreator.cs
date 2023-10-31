@@ -53,6 +53,16 @@ public partial class PatternCreator : Node2D
             {f, f, f, f, true, true, true, f, f, f, f, f, f},
         };
         
+        public static bool[,] Rabit01 => rabit01;
+        private static readonly bool[,] rabit01 = {
+            {f, f, f, f,    true, f, f, f, f, f, f, f, f},
+            {f, f, f, true, true, f, true, f, f, f, f, f, f},
+            {f, f, f, f,    f,    f,    f, true,true, f, f, f, f},
+            {f, f, f, true, f,    f, true, f, f, f, f, f, f},
+            {f, f, f, true, f,    f, f, f, f, f, f, f, f},
+            {f, f, f, true, f,    f, f, f, f, f, f, f, f},
+        };
+        
         public static bool[,] Random1 => random1;
         private static readonly bool[,] random1 = {
             {f, f, true, true, true, f, f, f, true, true, true, f, f},

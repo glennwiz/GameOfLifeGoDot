@@ -58,8 +58,15 @@ public partial class InputManager : Node2D
         if (Input.IsKeyPressed(Key.Key2)) DrawGosperGliderGunPattern();
         if (Input.IsKeyPressed(Key.Key3)) DrawPulsarPattern();
         if (Input.IsKeyPressed(Key.Key4)) DrawOwlPattern();
+        if (Input.IsKeyPressed(Key.Key5)) DrawRabit01Pattern();
     }
-        
+
+    private void DrawRabit01Pattern()
+    {
+        var rabbit = new PatternCreator.Pattern(PatternCreator.Pattern.Rabit01);
+        _grid.DrawPattern(rabbit);
+    }
+
     private void HandleSpaceKeyPress()
     {
         if (!Input.IsKeyPressed(Key.Space)) return;
