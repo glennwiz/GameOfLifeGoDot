@@ -6,14 +6,11 @@ namespace GameOfLife;
 
 public partial class Grid: Node2D
 {
-	public bool IsMouseDown { get; set; }	
- 
-	public bool DrawDeadCell  { get;set;}
-	private Color NewAliveColor { get; set; }
-
 	private readonly Random _random = new ();
 	private Vector2 _gridSize;
-
+	public bool IsMouseDown { get; set; }
+	public bool DrawDeadCell  { get;set;}
+	private Color NewAliveColor { get; set; }
 	public int CurrentStateIndex { get; set; }
 	public MatrixManipulation MatrixManipulation { get; }
 	public int GridWidth { get; set; }
@@ -53,64 +50,12 @@ public partial class Grid: Node2D
 		var viewportSize = _gridSize;;
 		GridWidth = (int)viewportSize.X / BoxSize;
 		GridHeight = (int)viewportSize.Y / BoxSize;
-		var emptyCellGrid = new Cell[GridWidth, GridHeight];
-		
-		for (var i = 0; i < GridWidth; i++)
-		{
-			for (var j = 0; j < GridHeight; j++)
-			{
-				var cellColor = Colors.Black;
-				var isAlive = false;
+		var emptyCellGrid = PatternCreator.GetInitialGrid(GridWidth, GridHeight);
 
-				// START PATTERNS
-				if ((i is >= 40 and <= 42 && j == 40) 
-					    || (i == 40 && j is >= 40 and <= 42) 
-					    || (i == 42 && j is >= 40 and <= 42))
-				{
-					cellColor = Colors.White;
-					isAlive = true;
-				}
-			
-				if ((i == 75 && j is 37 or 38 or 39 or 51 or 52 or 53)
-				    || (i == 78 && j is 36 or 50 or 54)
-				    || (i == 79 && j is 36 or 50 or 54)
-				    || (i == 80 && j is 37 or 38 or 39 or 51 or 52 or 53)
-				    || (i == 81 && j is 36 or 50 or 54)
-				    || (i == 82 && j is 36 or 50 or 54)
-				    || (i == 85 && j is 37 or 38 or 39 or 51 or 52 or 53))
-				{
-					cellColor = Colors.White;
-					isAlive = true;
-				}
-
-				if ((i == 50 && j is 57 or 58 or 59 or 61 or 62 or 63)
-				    || (i == 53 && j is 56 or 60 or 64)
-				    || (i == 54 && j is 56 or 60 or 64)
-				    || (i == 55 && j is 57 or 58 or 59 or 61 or 62 or 63)
-				    || (i == 56 && j is 56 or 60 or 64)
-				    || (i == 57 && j is 56 or 60 or 64)
-				    || (i == 60 && j is 57 or 58 or 59 or 61 or 62 or 63))
-				{
-					cellColor = Colors.White;
-					isAlive = true;
-				}
-
-				
-				emptyCellGrid[i, j] = new Cell
-				{
-					Color = cellColor,
-					IsAlive = isAlive,
-					Position = new Vector2(i, j),
-					State = "Alive"
-					
-				};
-			}
-		}
-		
 		var initialCellGrid = PatternCreator.CreatePattern(PatternCreator.Pattern.Star, emptyCellGrid);
 		ListOfCellArrayStates.Add(initialCellGrid);
 	}
-	
+
 	public int CountLiveNeighbors(Cell[,] grid, int x, int y)
 	{
 		var count = 0;
