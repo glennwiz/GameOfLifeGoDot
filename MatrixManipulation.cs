@@ -30,12 +30,7 @@ public class MatrixManipulation
             {
                 for (var y = 0; y < cells.GetLength(1); y++)
                 {
-                    cells[x, y] = new Cell
-                    {
-                        Color = Colors.Black,
-                        IsAlive = false,
-                        Position = new Vector2(x, y)
-                    };
+                    cells[x, y] = null;
                 }
             }
         }

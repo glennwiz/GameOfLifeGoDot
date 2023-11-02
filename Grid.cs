@@ -55,6 +55,7 @@ public partial class Grid: Node2D
 		var initialCellGrid = PatternCreator.CreatePattern(PatternCreator.Pattern.Star, emptyCellGrid);
 		ListOfCellArrayStates.Add(initialCellGrid);
 	}
+	
 
 	public int CountLiveNeighbors(Cell[,] grid, int x, int y)
 	{
@@ -62,19 +63,12 @@ public partial class Grid: Node2D
 		var width = grid.GetLength(0);
 		var height = grid.GetLength(1);
 
-		//offsets for all 8 neighbors, cell at center
-		(int, int)[] offsets =
-		{
-			(-1,-1), (0,-1), (1, -1), 
-			(-1, 0),         (1,  0), 
-			(-1, 1), (0, 1), (1,  1)
-		};
-
 		foreach (var offset in offsets)
 		{
 			var nx = (x + offset.Item1 + width) % width;
 			var ny = (y + offset.Item2 + height) % height;
 
+			if (grid[nx, ny] == null) continue;
 			if (grid[nx, ny].IsAlive)
 				count++;
 		}
@@ -184,28 +178,17 @@ public partial class Grid: Node2D
 		
 		ListOfCellArrayStates.Add(newGridState);
 		CurrentStateIndex++;
+		GD.Print("Generation: " + CurrentStateIndex);
 
-		// Optionally, limit the history to the last 1000 states
-		if (ListOfCellArrayStates.Count <= 1000) return;
+		// Optionally, limit the history to the last 200 states
+		if (ListOfCellArrayStates.Count <= 200) return;
 		
 		ListOfCellArrayStates.RemoveAt(0);
 		CurrentStateIndex--;
 	}
-
+	
 	public Color GetCellColor(int liveNeighbors)
 	{
-		Dictionary<int, Color> colorMap = new()
-		{
-			{0, Colors.Black},
-			{1, Colors.Red},
-			{2, Colors.Yellow},
-			{3, Colors.Green},
-			{4, Colors.Cyan},
-			{5, Colors.Blue},
-			{6, Colors.Magenta},
-			{7, Colors.White},
-		};
-
 		var cellColor = colorMap.ContainsKey(liveNeighbors) ? colorMap[liveNeighbors] : Colors.Gray;
 		return cellColor;
 	}
@@ -214,4 +197,25 @@ public partial class Grid: Node2D
 	{
 		throw new NotImplementedException();
 	}
+	
+	Dictionary<int, Color> colorMap = new()
+	{
+		{0, Colors.Black},
+		{1, Colors.Red},
+		{2, Colors.Yellow},
+		{3, Colors.Green},
+		{4, Colors.Cyan},
+		{5, Colors.Blue},
+		{6, Colors.Magenta},
+		{7, Colors.White},
+	};
+	
+	//offsets for all 8 neighbors, cell at center
+	(int, int)[] offsets =
+	{
+		(-1,-1), (0,-1), (1, -1), 
+		(-1, 0),         (1,  0), 
+		(-1, 1), (0, 1), (1,  1)
+	};
+
 }

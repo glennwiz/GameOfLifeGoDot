@@ -57,3 +57,11 @@ Mouse Interactions:
 //TODO:- Click and Drag: Toggle cells as you move the mouse."
 scroll_active = false
 autowrap_mode = 2
+
+[node name="GenCounter" type="RichTextLabel" parent="."]
+offset_left = 1033.0
+offset_top = 619.0
+offset_right = 1150.0
+offset_bottom = 646.0
+text = "Generation:
+"
