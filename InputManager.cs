@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using System;
+using Godot;
 
 namespace GameOfLife;
 
@@ -119,11 +120,46 @@ public partial class InputManager : Node2D
         }
     }
 
+    bool CopyBox = false;
     private void HandleTKeyPress()
     {
         if (Input.IsKeyPressed(Key.T))
         {
+            CopyBox = !CopyBox;
             HandleMirrorAndShift();
+        }
+        
+        if(CopyBox && Input.IsKeyPressed(Key.O))
+        {
+            //TODO: Copy the grid inside the box
+           
+            var currentPattern = _grid.ListOfCellArrayStates[_grid.CurrentStateIndex];
+            var mousePosition = GetGlobalMousePosition();
+            var mousePositionX = (int) (mousePosition.X / _grid.BoxSize);
+            var mousePositionY = (int) (mousePosition.Y / _grid.BoxSize);
+            var boxSize = 10;
+            
+            //Log the box
+            GD.Print(mousePositionX + " | " + mousePositionY);
+            
+            //grab the cells inside the box
+            var cellsInsideBox = new Cell[boxSize, boxSize];
+            for (var x = mousePositionX; x < Math.Min(mousePositionX + boxSize, currentPattern.GetLength(0)); x++)
+            {
+                for (var y = mousePositionY; y < Math.Min(mousePositionY + boxSize, currentPattern.GetLength(1)); y++)
+                {
+                    cellsInsideBox[x - mousePositionX , y - mousePositionY] = currentPattern[x, y];
+                    if(cellsInsideBox[x - mousePositionX , y - mousePositionY] == null) continue;
+                    if(cellsInsideBox[x - mousePositionX , y - mousePositionY].IsAlive) GD.Print("Alive");
+                }
+            }
+            
+            // mirror the cellsInsideBox
+            var mirroredCells = MatrixManipulation.MirrorMatrix(cellsInsideBox);
+            
+            //draw the mirrored cells
+            var pattern = new PatternCreator.Pattern(mirroredCells);
+            _grid.DrawPattern(pattern);
         }
     }
 

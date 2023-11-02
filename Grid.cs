@@ -42,7 +42,6 @@ public partial class Grid: Node2D
 	public void MirrorAndShift()
 	{
 		DrawCopyBox = !DrawCopyBox;
-		PatternCreator.CopyPattern();
 	}
 
 	private void InitGrid()

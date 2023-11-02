@@ -145,12 +145,6 @@ public partial class PatternCreator : Node2D
 
         return new Pattern(patternCells);
     }
-
-    public static Pattern CopyPattern()
-    {
-        GD.Print("!CopyPattern!");
-        return null;
-    }
     
     public static Cell[,] GetInitialGrid(int GridWidth, int GridHeight)
     {
