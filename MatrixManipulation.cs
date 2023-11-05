@@ -1,4 +1,6 @@
-﻿using Godot;
+﻿using System;
+using System.Collections.Generic;
+using Godot;
 
 namespace GameOfLife;
 
@@ -23,17 +25,30 @@ public class MatrixManipulation
 	
     public void ClearGrid(Grid grid)
     {
-        foreach (var cells in grid.ListOfCellArrayStates)
+        if (grid == null)
         {
-            // Clear all cells 
-            for (var x = 0; x <cells.GetLength(0) ; x++)
+            throw new ArgumentNullException(nameof(grid));
+        }
+    
+        var gridWidth = grid.GridWidth;
+        var gridHeight = grid.GridHeight;
+    
+        var emptyCellGrid = new Cell[gridWidth,gridHeight];
+
+        for (var x = 0; x < gridWidth; x++)
+        {
+            for (var y = 0; y < gridHeight; y++)
             {
-                for (var y = 0; y < cells.GetLength(1); y++)
-                {
-                    cells[x, y] = null;
-                }
+                emptyCellGrid[x, y] = null;
             }
         }
+
+        grid.ListOfCellArrayStates = new List<Cell[,]>
+        {
+            emptyCellGrid
+        };
+
+        grid.CurrentStateIndex = 0;
     }
 
     public static bool[,] MirrorMatrix(Cell[,] cellsInsideBox)

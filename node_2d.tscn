@@ -59,6 +59,7 @@ scroll_active = false
 autowrap_mode = 2
 
 [node name="GenCounter" type="RichTextLabel" parent="."]
+unique_name_in_owner = true
 offset_left = 1033.0
 offset_top = 619.0
 offset_right = 1150.0

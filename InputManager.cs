@@ -160,6 +160,8 @@ public partial class InputManager : Node2D
             //draw the mirrored cells
             var pattern = new PatternCreator.Pattern(mirroredCells);
             _grid.DrawPattern(pattern);
+            
+            //TODO: Fix the bug where the Mirroed cells is not drawn correctly and the already existing cells are removed, we should only add new cells
         }
     }
 
