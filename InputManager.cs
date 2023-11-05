@@ -27,7 +27,7 @@ public partial class InputManager : Node2D
         HandleQKeyPress();
         HandleUpKeyPress();
         HandleDownKeyPress();
-        HandleTKeyPress();
+        HandleTheMirrorCopyButtonT();
         HandleNumberKeyPresses();
         HandleRKeyPress();
         HandleZoomPress();
@@ -42,15 +42,19 @@ public partial class InputManager : Node2D
     private void ZoomIn()
     {
         _grid.BoxSize += 1;
-        _grid.GridWidth = (int)GetViewportRect().Size.X / _grid.BoxSize;
-        _grid.GridHeight = (int)GetViewportRect().Size.Y / _grid.BoxSize;
+        _grid.GridWidth = (int)GetViewportRect().Size.X / (int)_grid.BoxSize;
+        _grid.GridHeight = (int)GetViewportRect().Size.Y / (int)_grid.BoxSize;
     }
 
     private void ZoomOut()
     {
+        if (_grid.BoxSize <= 1)
+        {
+            return;
+        }
         _grid.BoxSize -= 1;
-        _grid.GridWidth = (int)GetViewportRect().Size.X / _grid.BoxSize;
-        _grid.GridHeight = (int)GetViewportRect().Size.Y / _grid.BoxSize;
+        _grid.GridWidth = (int)GetViewportRect().Size.X / (int)_grid.BoxSize;
+        _grid.GridHeight = (int)GetViewportRect().Size.Y / (int)_grid.BoxSize;
     }
 
     private void HandleNumberKeyPresses()
@@ -121,7 +125,7 @@ public partial class InputManager : Node2D
     }
 
     bool CopyBox = false;
-    private void HandleTKeyPress()
+    private void HandleTheMirrorCopyButtonT()
     {
         if (Input.IsKeyPressed(Key.T))
         {
@@ -131,34 +135,45 @@ public partial class InputManager : Node2D
         
         if(CopyBox && Input.IsKeyPressed(Key.O))
         {
-            //TODO: Copy the grid inside the box
-           
             var currentPattern = _grid.ListOfCellArrayStates[_grid.CurrentStateIndex];
             var mousePosition = GetGlobalMousePosition();
             var mousePositionX = (int) (mousePosition.X / _grid.BoxSize);
             var mousePositionY = (int) (mousePosition.Y / _grid.BoxSize);
-            var boxSize = 10;
+            const int redBoxSize = 10;
             
             //Log the box
             GD.Print(mousePositionX + " | " + mousePositionY);
             
+            // Determine the region of the original 2D array to sample
+            var startX = Math.Max(mousePositionX - redBoxSize / 2, 0);
+            var startY = Math.Max(mousePositionY - redBoxSize / 2, 0);
+            var endX = Math.Min(startX + redBoxSize, currentPattern.GetLength(0));
+            var endY = Math.Min(startY + redBoxSize, currentPattern.GetLength(1));
+            GD.Print(startX + " | " + startY + " | " + endX + " | " + endY);
             //grab the cells inside the box
-            var cellsInsideBox = new Cell[boxSize, boxSize];
-            for (var x = mousePositionX; x < Math.Min(mousePositionX + boxSize, currentPattern.GetLength(0)); x++)
+            var cellsInsideBox = new Cell[redBoxSize, redBoxSize];
+            for (var x = startX; x < endX; x++)
             {
-                for (var y = mousePositionY; y < Math.Min(mousePositionY + boxSize, currentPattern.GetLength(1)); y++)
+                for (var y = startY; y < endY; y++)
                 {
-                    cellsInsideBox[x - mousePositionX , y - mousePositionY] = currentPattern[x, y];
-                    if(cellsInsideBox[x - mousePositionX , y - mousePositionY] == null) continue;
-                    if(cellsInsideBox[x - mousePositionX , y - mousePositionY].IsAlive) GD.Print("Alive");
+                    cellsInsideBox[x - startX , y - startY] = currentPattern[x, y];
+                    if(cellsInsideBox[x - startX , y - startY] == null)
+                    {
+                        continue;
+                    }
+
+                    if(cellsInsideBox[x - startX , y - startY].IsAlive)
+                    {
+                        GD.Print("Alive");
+                    }
                 }
             }
             
             // mirror the cellsInsideBox
             var mirroredCells = MatrixManipulation.MirrorMatrix(cellsInsideBox);
-            
+            var boolGrid = MatrixManipulation.MakeBoolGrid(mirroredCells);
             //draw the mirrored cells
-            var pattern = new PatternCreator.Pattern(mirroredCells);
+            var pattern = new PatternCreator.Pattern(boolGrid);
             _grid.DrawPattern(pattern);
             
             //TODO: Fix the bug where the Mirroed cells is not drawn correctly and the already existing cells are removed, we should only add new cells

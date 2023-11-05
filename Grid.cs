@@ -20,7 +20,7 @@ public partial class Grid: Node2D
 	public float UpdateTickRate { get; set; } = 0.5f;
 	public bool ResetHigherGridArray { get; set; }
 	public List<Cell[,]> ListOfCellArrayStates { get; set; } = new(); 
-	public int BoxSize { get; set; } = 10;
+	public float BoxSize { get; set; } = 10;
 	public bool DebugState { get; set; } = true;
 	public bool DrawCopyBox { get; set; } = false;
 
@@ -47,8 +47,8 @@ public partial class Grid: Node2D
 	private void InitGrid()
 	{
 		var viewportSize = _gridSize;;
-		GridWidth = (int)viewportSize.X / BoxSize;
-		GridHeight = (int)viewportSize.Y / BoxSize;
+		GridWidth = (int)viewportSize.X / (int)BoxSize;
+		GridHeight = (int)viewportSize.Y / (int)BoxSize;
 		var emptyCellGrid = PatternCreator.GetInitialGrid(GridWidth, GridHeight);
 
 		var initialCellGrid = PatternCreator.CreatePattern(PatternCreator.Pattern.Star, emptyCellGrid);

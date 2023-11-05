@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 namespace GameOfLife;
@@ -77,35 +78,29 @@ public partial class GameGridHandler : Node2D
     private void DrawCells()
     {
         var currentGridState = _grid.ListOfCellArrayStates[_grid.CurrentStateIndex];
+        int gridStateWidth = currentGridState.GetLength(0);
+        int gridStateHeight = currentGridState.GetLength(1);
+        int gridWidth = Math.Min(_grid.GridWidth, gridStateWidth);
+        int gridHeight = Math.Min(_grid.GridHeight, gridStateHeight);
 
-        for (var x = 0; x < _grid.GridWidth; x++)
+        Vector2 rectSize = new Vector2(100, 100);
+        Rect2 drawRect = _grid.DrawCopyBox ? new Rect2(new Vector2(GetGlobalMousePosition().X - 50,GetGlobalMousePosition().Y - 50), rectSize) : new Rect2();
+
+        for (var x = 0; x < gridWidth; x++)
         {
-            for (var y = 0; y < _grid.GridHeight; y++)
+            for (var y = 0; y < gridHeight; y++)
             {
-                // Check if there is a cell at this position
-                if(x >= currentGridState.GetLength(0) || y >= currentGridState.GetLength(1))
-                {
-                    continue;
-                }
-                
-                if (currentGridState[x, y] == null)
-                {
-                    continue;
-                }
-
-                if (_grid.DrawDeadCell || currentGridState[x, y].IsAlive)
+                if (currentGridState[x, y] != null && (_grid.DrawDeadCell || currentGridState[x, y].IsAlive))
                 {
                     // Use the cell's color when drawing
                     DrawBox(x, y, currentGridState[x, y].Color);
                 }
-
-                if (_grid.DrawCopyBox)
-                {
-                    //draw a red square around the mouse position
-                    var mousePosition = GetGlobalMousePosition();
-                    DrawRect(new Rect2(mousePosition, new Vector2(80, 80)), Colors.Red, false);
-                }
             }
+        }
+
+        if (_grid.DrawCopyBox)
+        {
+            DrawRect(drawRect, Colors.Red, false);
         }
     }
 
