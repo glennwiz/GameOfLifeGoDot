@@ -11,7 +11,8 @@ public partial class GameGridHandler : Node2D
     private GridController _controller;
     private InputManager _inputManager;
     private PatternCreator _patternCreator;
-
+ 
+    
     public override void _Ready()
     { 
         InitComponents();
@@ -78,14 +79,13 @@ public partial class GameGridHandler : Node2D
     private void DrawCells()
     {
         var currentGridState = _grid.ListOfCellArrayStates[_grid.CurrentStateIndex];
-        int gridStateWidth = currentGridState.GetLength(0);
-        int gridStateHeight = currentGridState.GetLength(1);
-        int gridWidth = Math.Min(_grid.GridWidth, gridStateWidth);
-        int gridHeight = Math.Min(_grid.GridHeight, gridStateHeight);
+        var gridStateWidth = currentGridState.GetLength(0);
+        var gridStateHeight = currentGridState.GetLength(1);
+        var gridWidth = Math.Min(_grid.GridWidth, gridStateWidth);
+        var gridHeight = Math.Min(_grid.GridHeight, gridStateHeight);
 
-        Vector2 rectSize = new Vector2(100, 100);
-        Rect2 drawRect = _grid.DrawCopyBox ? new Rect2(new Vector2(GetGlobalMousePosition().X - 50,GetGlobalMousePosition().Y - 50), rectSize) : new Rect2();
-
+        const int boxSize = 100;
+     
         for (var x = 0; x < gridWidth; x++)
         {
             for (var y = 0; y < gridHeight; y++)
@@ -98,6 +98,16 @@ public partial class GameGridHandler : Node2D
             }
         }
 
+        DrawTheRedCopyBox(boxSize);
+    }
+
+    private void DrawTheRedCopyBox(int boxSize)
+    {
+        var rectSize = new Vector2(boxSize, boxSize);
+        var drawRect = _grid.DrawCopyBox
+            ? new Rect2(new Vector2(GetGlobalMousePosition().X - boxSize / 2, GetGlobalMousePosition().Y - boxSize / 2),
+                rectSize)
+            : new Rect2(); //TODO: i think i need to move the mouse pos to a 1 time a sec sampler, not for every draw like this
         if (_grid.DrawCopyBox)
         {
             DrawRect(drawRect, Colors.Red, false);
@@ -134,7 +144,7 @@ public partial class GameGridHandler : Node2D
     {
         GD.Print(node.Name);
 
-        foreach (Node child in node.GetChildren())
+        foreach (var child in node.GetChildren())
         {
             DebugPrintAllNodes(child);
         }
