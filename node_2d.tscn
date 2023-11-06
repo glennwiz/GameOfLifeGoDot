@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://c8wopbd80m8rh"]
+[gd_scene load_steps=6 format=3 uid="uid://c8wopbd80m8rh"]
 
 [ext_resource type="Script" path="res://GameGridHandler.cs" id="1_8h4re"]
 [ext_resource type="Shader" path="res://node_2d.gdshader" id="1_y2qpu"]
+[ext_resource type="Script" path="res://Timer.cs" id="3_knpy7"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qs1oe"]
 shader = ExtResource("1_y2qpu")
@@ -66,3 +67,10 @@ offset_right = 1150.0
 offset_bottom = 646.0
 text = "Generation:
 "
+
+[node name="Timer" type="Timer" parent="."]
+process_callback = 0
+autostart = true
+script = ExtResource("3_knpy7")
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
