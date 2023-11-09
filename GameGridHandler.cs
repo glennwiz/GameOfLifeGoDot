@@ -154,7 +154,6 @@ public partial class GameGridHandler : Node2D
 	private void _on_timer_timeout()
 	{
 		GD.Print("TimeOut");
-		var x = GetGlobalMousePosition();
-		GD.Print("x = " + x);
+		
 	}
 }

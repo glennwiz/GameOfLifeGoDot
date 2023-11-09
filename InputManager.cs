@@ -145,24 +145,29 @@ public partial class InputManager : Node2D
 			GD.Print(mousePositionX + " | " + mousePositionY);
 			
 			// Determine the region of the original 2D array to sample
-			var startX = Math.Max(mousePositionX - redBoxSize / 2, 0);
-			var startY = Math.Max(mousePositionY - redBoxSize / 2, 0);
+			var redBoxHalf = redBoxSize != 0 ? redBoxSize / 2 : 0;
+			var startX = Math.Max(mousePositionX - redBoxHalf, 0);
+			var startY = Math.Max(mousePositionY - redBoxHalf, 0);
 			var endX = Math.Min(startX + redBoxSize, currentPattern.GetLength(0));
 			var endY = Math.Min(startY + redBoxSize, currentPattern.GetLength(1));
+			
 			GD.Print(startX + " | " + startY + " | " + endX + " | " + endY);
+
 			//grab the cells inside the box
 			var cellsInsideBox = new Cell[redBoxSize, redBoxSize];
-			for (var x = startX; x < endX; x++)
+			for (var x = startX; x < endX && x - startX < redBoxSize; x++)
 			{
-				for (var y = startY; y < endY; y++)
+				for (var y = startY; y < endY && y - startY < redBoxSize; y++)
 				{
 					cellsInsideBox[x - startX , y - startY] = currentPattern[x, y];
-					if(cellsInsideBox[x - startX , y - startY] == null)
+					var cell = cellsInsideBox[x - startX , y - startY];
+        
+					if(cell == null)
 					{
 						continue;
 					}
 
-					if(cellsInsideBox[x - startX , y - startY].IsAlive)
+					if(cell.IsAlive)
 					{
 						GD.Print("Alive");
 					}
