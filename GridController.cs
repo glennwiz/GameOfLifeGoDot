@@ -21,12 +21,10 @@ public partial class GridController : Node2D
         if (_grid.IsPaused) return;
         
         _grid.TimeElapsed += delta;
-
-        if (_grid.TimeElapsed >= _grid.UpdateTickRate)
-        {
-            PerformGridUpdate();
-            _grid.TimeElapsed = 0.0;
-        }
+        if (!(_grid.TimeElapsed >= _grid.UpdateTickRate)) return;
+        
+        PerformGridUpdate();
+        _grid.TimeElapsed = 0.0;
     }
     
     private void PerformGridUpdate()

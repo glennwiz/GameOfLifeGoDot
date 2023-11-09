@@ -23,6 +23,7 @@ public partial class Grid: Node2D
 	public float BoxSize { get; set; } = 10;
 	public bool DebugState { get; set; } = true;
 	public bool DrawCopyBox { get; set; } = false;
+	public Vector2 MoPo { get; set; }
 
 	// Default speed value
 	private const float DefaultUpdateTickRate = 0.5f;
