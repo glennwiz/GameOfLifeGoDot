@@ -12,14 +12,21 @@ public partial class GameGridHandler : Node2D
 	private InputManager _inputManager;
 	private PatternCreator _patternCreator;
 	private Timer _timer;
- 
+	private static CellPool cellPool;
+	
+	public static CellPool GetCellPool() => cellPool;
 	
 	public override void _Ready()
 	{
+		var initialPoolSize = 1000; // Adjust based on your grid size/requirements
+		cellPool = new CellPool(initialPoolSize);
+		
 		InitComponents();
 		AddComponentsToScene();
 		DebugPrintAllNodes(this);
 	}
+	
+	
 
 	public override void _Process(double delta)
 	{
