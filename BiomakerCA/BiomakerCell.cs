@@ -18,7 +18,7 @@ public interface INutrientConsumer
     void AbsorbNutrients();
 }
 
-public class Cell
+public class CellBiomaker
 {
     public CellType Type { get; private set; }
     public float StructuralIntegrity { get; private set; }
@@ -28,7 +28,7 @@ public class Cell
     public string AgentId { get; private set; }
     // ... other properties as needed
 
-    public Cell(CellType type)
+    public CellBiomaker(CellType type)
     {
         Type = type;
         // Initialize other properties as needed
@@ -45,7 +45,7 @@ public class Cell
     // ... other methods as needed
 }
 
-public class AgentCell : Cell, INutrientConsumer
+public class AgentCell : CellBiomaker, INutrientConsumer
 {
     public AgentCell(CellType type) : base(type)
     {

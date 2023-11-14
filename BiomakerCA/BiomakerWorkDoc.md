@@ -3,6 +3,9 @@
 ## Overview
 This document outlines the implementation of a Biomaker Cellular Automata (CA) system into the existing Game of Life project using Godot and C#. The new system will simulate a complex environment where each cell has multiple properties such as type, structural integrity, age, and various nutrients.
 
+## Prerequesits
+- Add F1 and F2 to swap betwen 'Game of Life' and Biomaker sceens
+
 ## Goals
 - Extend the current Cellular Automata to support multiple properties per cell.
 - Create a more immersive and complex simulation for players to interact with.
