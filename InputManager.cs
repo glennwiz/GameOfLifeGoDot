@@ -27,50 +27,54 @@ public partial class InputManager : Node2D
 			{Key.Space, () => TogglePause()},
 			{Key.S, () => HandleGridReset()},
 			{Key.Q, () => ToggleDrawDeadCell()},
-			{Key.Up, () => HandleUpKeyPress()},
-			{Key.Down, () => HandleDownKeyPress()},
+			{Key.Up, () =>
+				{ 		
+					HideRichTextLabel();
+					DecreaseTickRate(); 
+				}
+				
+			},
+			{Key.Down, () => IncreaseTickRate()},
 			{Key.Left, () => _grid.Rewind()},
 			{Key.Right, () => _grid.StepForward()},
-			{Key.T, () => HandleTheMirrorCopyButtonT()},
-			{Key.Key1, () => DrawGliderPattern()},
-			{Key.Key2, () => DrawGosperGliderGunPattern()},
-			{Key.Key3, () => DrawPulsarPattern()},
-			{Key.Key4, () => DrawOwlPattern()},
-			{Key.Key5, () => DrawRabbit01Pattern()},
-			{Key.R, () => DrawRandomPattern()},
 			{Key.C, () => ZoomOut()},
 			{Key.V, () => ZoomIn()},
+			{Key.T, () =>
+				{
+					CopyBox = !CopyBox;
+					Mirror();
+				}
+			},
+			{Key.O, () =>
+				{
+						_grid.ToggleDrawCopyBox();
+				}
+			},
+			
+			{Key.Key1, () => _patternCreator.DrawGliderPattern()},
+			{Key.Key2, () => _patternCreator.DrawGosperGliderGunPattern()},
+			{Key.Key3, () => _patternCreator.DrawPulsarPattern()},
+			{Key.Key4, () => _patternCreator.DrawOwlPattern()},
+			{Key.Key5, () => _patternCreator.DrawRabbit01Pattern()},
+			{Key.R, () => _patternCreator.DrawRandomPattern()},
 		};
 	}
 	
-	private void HandleKeyPressEvents()
-	{
-
-		 HandleZoomPress();
-	}
+	private void ToggleDrawDeadCell() => _grid.DrawDeadCell = !_grid.DrawDeadCell;
+	private void DecreaseTickRate() => _grid.UpdateTickRate -= 0.02f;
+	private void IncreaseTickRate() => _grid.UpdateTickRate += 0.02f;
 
 	public override void _Input(InputEvent @event) 
 	{
 		if (@event is InputEventKey eventKey && eventKey.Pressed)
 		{
-			HandleKeyPress(eventKey.Keycode);
+			if (_keyActions.TryGetValue(eventKey.Keycode, out var action))
+			{
+				action.Invoke();
+			}
 		}
 	
 		HandleMouseInputEvents(@event);
-	}
-	
-	private void HandleKeyPress(Key key)
-	{
-		if (_keyActions.TryGetValue(key, out var action))
-		{
-			action.Invoke();
-		}
-	}
-	
-	private void HandleZoomPress()
-	{
-		if (Input.IsKeyPressed(Key.C)) ZoomOut();
-		if (Input.IsKeyPressed(Key.V)) ZoomIn();
 	}
 
 	private void ZoomIn()
@@ -90,100 +94,56 @@ public partial class InputManager : Node2D
 		_grid.GridWidth = (int)GetViewportRect().Size.X / (int)_grid.BoxSize;
 		_grid.GridHeight = (int)GetViewportRect().Size.Y / (int)_grid.BoxSize;
 	}
-
-	private void DrawRabbit01Pattern() //17k pattern?
-	{
-		var rabbit = new PatternCreator.Pattern(PatternCreator.Pattern.Rabit01);
-		_grid.DrawPattern(rabbit);
-	}
-
-				
-	private void HandleSKeyPress()
-	{
-		if (Input.IsKeyPressed(Key.S)) 
-		{
-			HandleGridReset();
-		}
-	}
-
-	private void HandleQKeyPress()
-	{
-		if (Input.IsKeyPressed(Key.Q))
-		{
-			ToggleDrawDeadCell();
-		}
-	}
-
-	private void HandleUpKeyPress()
-	{
-		HideRichTextLabel();
-		DecreaseTickRate();
-	}
-		
-	private void HandleDownKeyPress()
-	{
-		IncreaseTickRate();
-	}
-
 	
-	private void HandleTheMirrorCopyButtonT()
+	private void Mirror()
 	{
-		if (Input.IsKeyPressed(Key.T))
-		{
-			CopyBox = !CopyBox;
-			HandleMirrorAndShift();
-		}
+		var currentPattern = _grid.ListOfCellArrayStates[_grid.CurrentStateIndex];
+		var mousePosition = GetGlobalMousePosition();
+		var mousePositionX = (int) (mousePosition.X / _grid.BoxSize);
+		var mousePositionY = (int) (mousePosition.Y / _grid.BoxSize);
+		const int redBoxSize = 10;
 		
-		if(CopyBox && Input.IsKeyPressed(Key.O))
-		{
-			var currentPattern = _grid.ListOfCellArrayStates[_grid.CurrentStateIndex];
-			var mousePosition = GetGlobalMousePosition();
-			var mousePositionX = (int) (mousePosition.X / _grid.BoxSize);
-			var mousePositionY = (int) (mousePosition.Y / _grid.BoxSize);
-			const int redBoxSize = 10;
-			
-			//Log the box
-			GD.Print(mousePositionX + " | " + mousePositionY);
-			
-			// Determine the region of the original 2D array to sample
-			var redBoxHalf = redBoxSize != 0 ? redBoxSize / 2 : 0;
-			var startX = Math.Max(mousePositionX - redBoxHalf, 0);
-			var startY = Math.Max(mousePositionY - redBoxHalf, 0);
-			var endX = Math.Min(startX + redBoxSize, currentPattern.GetLength(0));
-			var endY = Math.Min(startY + redBoxSize, currentPattern.GetLength(1));
-			
-			GD.Print(startX + " | " + startY + " | " + endX + " | " + endY);
+		//Log the box
+		GD.Print(mousePositionX + " | " + mousePositionY);
+		
+		// Determine the region of the original 2D array to sample
+		var redBoxHalf = redBoxSize != 0 ? redBoxSize / 2 : 0;
+		var startX = Math.Max(mousePositionX - redBoxHalf, 0);
+		var startY = Math.Max(mousePositionY - redBoxHalf, 0);
+		var endX = Math.Min(startX + redBoxSize, currentPattern.GetLength(0));
+		var endY = Math.Min(startY + redBoxSize, currentPattern.GetLength(1));
+		
+		GD.Print(startX + " | " + startY + " | " + endX + " | " + endY);
 
-			//grab the cells inside the box
-			var cellsInsideBox = new Cell[redBoxSize, redBoxSize];
-			for (var x = startX; x < endX && x - startX < redBoxSize; x++)
+		//grab the cells inside the box
+		var cellsInsideBox = new Cell[redBoxSize, redBoxSize];
+		for (var x = startX; x < endX && x - startX < redBoxSize; x++)
+		{
+			for (var y = startY; y < endY && y - startY < redBoxSize; y++)
 			{
-				for (var y = startY; y < endY && y - startY < redBoxSize; y++)
+				cellsInsideBox[x - startX , y - startY] = currentPattern[x, y];
+				var cell = cellsInsideBox[x - startX , y - startY];
+	
+				if(cell == null)
 				{
-					cellsInsideBox[x - startX , y - startY] = currentPattern[x, y];
-					var cell = cellsInsideBox[x - startX , y - startY];
-		
-					if(cell == null)
-					{
-						continue;
-					}
+					continue;
+				}
 
-					if(cell.IsAlive)
-					{
-						GD.Print("Alive");
-					}
+				if(cell.IsAlive)
+				{
+					GD.Print("Alive");
 				}
 			}
-			
-			// mirror the cellsInsideBox
-			var mirroredCells = MatrixManipulation.MirrorMatrix(cellsInsideBox);
-			var boolGrid = MatrixManipulation.MakeBoolGrid(mirroredCells);
-			//draw the mirrored cells
-			var pattern = new PatternCreator.Pattern(boolGrid);
-			_grid.DrawPattern(pattern);
-			
-			//TODO: Fix the bug where the Mirroed cells is not drawn correctly and the already existing cells are removed, we should only add new cells
 		}
+		
+		// mirror the cellsInsideBox
+		var mirroredCells = MatrixManipulation.MirrorMatrix(cellsInsideBox);
+		var boolGrid = MatrixManipulation.MakeBoolGrid(mirroredCells);
+		//draw the mirrored cells
+		var pattern = new PatternCreator.Pattern(boolGrid);
+		_grid.DrawPattern(pattern);
+		
+		//TODO: Fix the bug where the Mirroed cells is not drawn correctly and the already existing cells are removed, we should only add new cells
 	}
 
 	private void HandleMouseClicked()
@@ -192,18 +152,6 @@ public partial class InputManager : Node2D
 		_grid.DrawPattern(randomPattern);
 	}
 		
-	private void DrawOwlPattern()
-	{
-		var pattern = new PatternCreator.Pattern(PatternCreator.Pattern.CustomPattern);
-		_grid.DrawPattern(pattern);
-	}
-
-	private void DrawRandomPattern()
-	{
-		var randomPattern = PatternCreator.CreateRandomPattern(30, 30, 0.1f);
-		_grid.DrawPattern(randomPattern);
-	}
-
 	private void HandleMouseInputEvents(InputEvent @event)
 	{
 		if (@event is InputEventMouseButton mouseButtonEvent) HandleMouseClick(mouseButtonEvent);
@@ -241,10 +189,6 @@ public partial class InputManager : Node2D
 		QueueRedraw();
 	}
 
-	private void ToggleDrawDeadCell() => _grid.DrawDeadCell = !_grid.DrawDeadCell;
-	private void DecreaseTickRate() => _grid.UpdateTickRate -= 0.02f;
-	private void IncreaseTickRate() => _grid.UpdateTickRate += 0.02f;
-	private void HandleMirrorAndShift() => _grid.MirrorAndShift();
 
 	private void ToggleCell(Vector2 position)
 	{
@@ -254,33 +198,6 @@ public partial class InputManager : Node2D
 		QueueRedraw();
 	}
 
-	private void DrawGliderPattern()
-	{
-		var gliderCells = new[,]
-		{
-			{false, true , false},
-			{false, false, true},
-			{true , true , true}
-		};
-
-		var glider = new PatternCreator.Pattern(gliderCells);
-		_grid.DrawPattern(glider);
-	}
-
-	private void DrawGosperGliderGunPattern()
-	{
-		var rotated = MatrixManipulation.RotateMatrix90(PatternCreator.Pattern.GosperGun);
-		var gosperGliderGun = new PatternCreator.Pattern(rotated);
-		_grid.DrawPattern(gosperGliderGun);
-	}
-		
-	private void DrawPulsarPattern()
-	{
-		var rotated = MatrixManipulation.RotateMatrix90(PatternCreator.Pattern.Pulsar);
-		var pulsarPattern = new PatternCreator.Pattern(rotated);
-		_grid.DrawPattern(pulsarPattern);
-	}
-		
 	private void HideRichTextLabel()
 	{
 		NodePath path = "../RichTextLabel";
