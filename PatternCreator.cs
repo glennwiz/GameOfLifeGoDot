@@ -123,7 +123,7 @@ public partial class PatternCreator : Node2D
                 var y = (midHeight - patternHeight / 2 + j + initialHeight) % initialHeight;
 
                 // Modify initialState according to pattern
-                initialState[x, y] = pattern.Cells[i, j] ? new Cell() : initialState[x, y];
+                initialState[x, y] = pattern.Cells[i, j] ? pool.GetCell() : initialState[x, y];
             }
         }
 

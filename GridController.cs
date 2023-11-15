@@ -65,10 +65,10 @@ public partial class GridController : Node2D
     private Cell GetNewCellByBriansBrainRules(Cell[,] currentGrid, int x, int y)
     {
         var liveNeighbors = _grid.CountLiveNeighbors(currentGrid, x, y); // Assuming this function can count states other than "Alive"
-        if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return new Cell(); // Presuming the Cell constructor initializes to Dead
+        if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return pool.GetCell();// Presuming the Cell constructor initializes to Dead
 
         var currentCell = currentGrid[x, y];
-        var newCell = new Cell(); // Initialize as Dead by default
+        var newCell = pool.GetCell(); // Initialize as Dead by default
     
         if (currentCell.State == "Alive") {
             newCell.State = "Dying";
