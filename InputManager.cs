@@ -161,7 +161,7 @@ public partial class InputManager : Node2D
 				{
 					cellsInsideBox[x - startX , y - startY] = currentPattern[x, y];
 					var cell = cellsInsideBox[x - startX , y - startY];
-        
+		
 					if(cell == null)
 					{
 						continue;

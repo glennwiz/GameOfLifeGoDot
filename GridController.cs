@@ -4,6 +4,7 @@ namespace GameOfLife;
 
 public partial class GridController : Node2D
 {
+    private CellPool pool = GameGridHandler.GetCellPool();
     private readonly Grid _grid;
 
     public GridController(Grid grid)
@@ -55,7 +56,7 @@ public partial class GridController : Node2D
     private Cell GetNewCellByConwaysRules(Cell[,] currentGrid, int x, int y)
     {
         var liveNeighbors = _grid.CountLiveNeighbors(currentGrid, x, y);
-        if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return new Cell();
+        if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return pool.GetCell(); 
         
         var newCell = InitializeCell(liveNeighbors, currentGrid[x, y]?.IsAlive ?? false, x, y);
         return newCell;
@@ -64,10 +65,10 @@ public partial class GridController : Node2D
     private Cell GetNewCellByBriansBrainRules(Cell[,] currentGrid, int x, int y)
     {
         var liveNeighbors = _grid.CountLiveNeighbors(currentGrid, x, y); // Assuming this function can count states other than "Alive"
-        if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return new Cell(); // Presuming the Cell constructor initializes to Dead
+        if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return pool.GetCell();// Presuming the Cell constructor initializes to Dead
 
         var currentCell = currentGrid[x, y];
-        var newCell = new Cell(); // Initialize as Dead by default
+        var newCell = pool.GetCell(); // Initialize as Dead by default
     
         if (currentCell.State == "Alive") {
             newCell.State = "Dying";
@@ -92,13 +93,13 @@ public partial class GridController : Node2D
     private Cell InitializeCell(int liveNeighbors, bool isAlive, int x, int y)
     {
         var cellColor = _grid.GetCellColor(liveNeighbors);
+
+        var cell = pool.GetCell();
+        cell.LiveNeighbors = liveNeighbors;
+        cell.Color = cellColor;
+        cell.IsAlive = isAlive ? liveNeighbors is 2 or 3 : (liveNeighbors == 3);
+        cell.Position = new Vector2(x, y);
         
-        return new Cell
-        {
-           LiveNeighbors = liveNeighbors,
-           Color = cellColor,
-           IsAlive = isAlive ? liveNeighbors is 2 or 3 : (liveNeighbors == 3),
-           Position = new Vector2(x, y)
-        };
+        return cell;    
     }
 }

@@ -5,6 +5,7 @@ namespace GameOfLife;
 
 public partial class PatternCreator : Node2D
 {
+    static CellPool pool = GameGridHandler.GetCellPool();
     static Random _random = new Random();
     
     public class Pattern
@@ -122,7 +123,7 @@ public partial class PatternCreator : Node2D
                 var y = (midHeight - patternHeight / 2 + j + initialHeight) % initialHeight;
 
                 // Modify initialState according to pattern
-                initialState[x, y] = pattern.Cells[i, j] ? new Cell() : initialState[x, y];
+                initialState[x, y] = pattern.Cells[i, j] ? pool.GetCell() : initialState[x, y];
             }
         }
 
@@ -190,13 +191,13 @@ public partial class PatternCreator : Node2D
                     isAlive = true;
                 }
 
-                emptyCellGrid[i, j] = new Cell
-                {
-                    Color = cellColor,
-                    IsAlive = isAlive,
-                    Position = new Vector2(i, j),
-                    State = "Alive"
-                };
+                var cell = pool.GetCell();
+                cell.Color = cellColor;
+                cell.IsAlive = isAlive;
+                cell.Position = new Vector2(i, j);
+                cell.State = "Alive";
+                
+                emptyCellGrid[i, j] = cell;
             }
         }
 
