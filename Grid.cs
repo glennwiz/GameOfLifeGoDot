@@ -6,6 +6,7 @@ namespace GameOfLife;
 
 public partial class Grid: Node2D
 {
+	private static CellPool pool = GameGridHandler.GetCellPool();
 	private readonly Random _random = new ();
 	private Vector2 _gridSize;
 	public bool IsMouseDown { get; set; }
@@ -157,12 +158,12 @@ public partial class Grid: Node2D
 		
 		if(currentGridState[x, y] == null)
 		{
-			currentGridState[x, y] = new Cell()
-			{
-				IsAlive = true , 
-				Position = new Vector2(x, y),
-				Color = Colors.Yellow,
-			};
+			var cell = pool.GetCell();
+			cell.IsAlive = true;
+			cell.Position = new Vector2(x, y);
+			cell.Color = Colors.Yellow;
+
+			currentGridState[x, y] = cell;
 			return;
 		}
 		
