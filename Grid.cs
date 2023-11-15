@@ -218,5 +218,4 @@ public partial class Grid: Node2D
 		(-1, 0),         (1,  0), 
 		(-1, 1), (0, 1), (1,  1)
 	};
-
 }

@@ -5,8 +5,14 @@ namespace GameOfLife;
 
 public partial class PatternCreator : Node2D
 {
+    private readonly Grid _grid;
     static CellPool pool = GameGridHandler.GetCellPool();
     static Random _random = new Random();
+
+    public PatternCreator(Grid grid)
+    {
+        _grid = grid;
+    }
     
     public class Pattern
     {

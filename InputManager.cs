@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 
 namespace GameOfLife;
@@ -6,33 +7,66 @@ namespace GameOfLife;
 public partial class InputManager : Node2D 
 {
 	private readonly Grid _grid;
+	private readonly PatternCreator _patternCreator;
 	private void TogglePause() => _grid.IsPaused = !_grid.IsPaused;
+	private Dictionary<Key, Action> _keyActions;
 
-	public InputManager(Grid grid) 
+	bool CopyBox = false;
+	
+	public InputManager(Grid grid, PatternCreator patternCreator) 
 	{
 		_grid = grid;
-	}
-		
-	public override void _Input(InputEvent @event) 
-	{
-		HandleKeyPressEvents();
-		HandleMouseInputEvents(@event);
+		_patternCreator = patternCreator;
+		InitializeKeyActions();
 	}
 
+	private void InitializeKeyActions()
+	{
+		_keyActions = new Dictionary<Key, Action>
+		{
+			{Key.Space, () => TogglePause()},
+			{Key.S, () => HandleGridReset()},
+			{Key.Q, () => ToggleDrawDeadCell()},
+			{Key.Up, () => HandleUpKeyPress()},
+			{Key.Down, () => HandleDownKeyPress()},
+			{Key.Left, () => _grid.Rewind()},
+			{Key.Right, () => _grid.StepForward()},
+			{Key.T, () => HandleTheMirrorCopyButtonT()},
+			{Key.Key1, () => DrawGliderPattern()},
+			{Key.Key2, () => DrawGosperGliderGunPattern()},
+			{Key.Key3, () => DrawPulsarPattern()},
+			{Key.Key4, () => DrawOwlPattern()},
+			{Key.Key5, () => DrawRabbit01Pattern()},
+			{Key.R, () => DrawRandomPattern()},
+			{Key.C, () => ZoomOut()},
+			{Key.V, () => ZoomIn()},
+		};
+	}
+	
 	private void HandleKeyPressEvents()
 	{
-		HandleSpaceKeyPress();
-		HandlePauseDependentKeyPresses();
-		HandleSKeyPress();
-		HandleQKeyPress();
-		HandleUpKeyPress();
-		HandleDownKeyPress();
-		HandleTheMirrorCopyButtonT();
-		HandleNumberKeyPresses();
-		HandleRKeyPress();
-		HandleZoomPress();
+
+		 HandleZoomPress();
 	}
 
+	public override void _Input(InputEvent @event) 
+	{
+		if (@event is InputEventKey eventKey && eventKey.Pressed)
+		{
+			HandleKeyPress(eventKey.Keycode);
+		}
+	
+		HandleMouseInputEvents(@event);
+	}
+	
+	private void HandleKeyPress(Key key)
+	{
+		if (_keyActions.TryGetValue(key, out var action))
+		{
+			action.Invoke();
+		}
+	}
+	
 	private void HandleZoomPress()
 	{
 		if (Input.IsKeyPressed(Key.C)) ZoomOut();
@@ -57,39 +91,12 @@ public partial class InputManager : Node2D
 		_grid.GridHeight = (int)GetViewportRect().Size.Y / (int)_grid.BoxSize;
 	}
 
-	private void HandleNumberKeyPresses()
-	{
-		if (Input.IsKeyPressed(Key.Key1)) DrawGliderPattern();
-		if (Input.IsKeyPressed(Key.Key2)) DrawGosperGliderGunPattern();
-		if (Input.IsKeyPressed(Key.Key3)) DrawPulsarPattern();
-		if (Input.IsKeyPressed(Key.Key4)) DrawOwlPattern();
-		if (Input.IsKeyPressed(Key.Key5)) DrawRabbit01Pattern();
-	}
-
 	private void DrawRabbit01Pattern() //17k pattern?
 	{
 		var rabbit = new PatternCreator.Pattern(PatternCreator.Pattern.Rabit01);
 		_grid.DrawPattern(rabbit);
 	}
 
-	private void HandleSpaceKeyPress()
-	{
-		if (!Input.IsKeyPressed(Key.Space)) return;
-		ResetHigherGridArray();
-		TogglePause();
-	}
-		
-	private void HandlePauseDependentKeyPresses()
-	{
-		if (!_grid.IsPaused) return;
-		HandleKeyPressedLeftRight();
-	}
-
-	private void HandleKeyPressedLeftRight()
-	{
-		if (Input.IsKeyPressed(Key.Left)) _grid.Rewind();
-		if (Input.IsKeyPressed(Key.Right)) _grid.StepForward();
-	}
 				
 	private void HandleSKeyPress()
 	{
@@ -109,22 +116,16 @@ public partial class InputManager : Node2D
 
 	private void HandleUpKeyPress()
 	{
-		if (Input.IsKeyPressed(Key.Up)) 
-		{
-			HideRichTextLabel();
-			DecreaseTickRate();
-		}
+		HideRichTextLabel();
+		DecreaseTickRate();
 	}
 		
 	private void HandleDownKeyPress()
 	{
-		if (Input.IsKeyPressed(Key.Down))
-		{
-			IncreaseTickRate();
-		}
+		IncreaseTickRate();
 	}
 
-	bool CopyBox = false;
+	
 	private void HandleTheMirrorCopyButtonT()
 	{
 		if (Input.IsKeyPressed(Key.T))
@@ -197,10 +198,8 @@ public partial class InputManager : Node2D
 		_grid.DrawPattern(pattern);
 	}
 
-	private void HandleRKeyPress()
+	private void DrawRandomPattern()
 	{
-		if (!Input.IsKeyPressed(Key.R)) return;
-			
 		var randomPattern = PatternCreator.CreateRandomPattern(30, 30, 0.1f);
 		_grid.DrawPattern(randomPattern);
 	}
@@ -288,13 +287,5 @@ public partial class InputManager : Node2D
 		var childNode = GetNode<RichTextLabel>(path);
 		childNode.Visible = false;
 		GD.Print(childNode.Name);
-	}
-				
-	private void ResetHigherGridArray()
-	{
-		if (!_grid.ResetHigherGridArray) return;
-			
-		var currentStateIndex = _grid.CurrentStateIndex;
-		_grid.ListOfCellArrayStates.RemoveRange(currentStateIndex + 1, _grid.ListOfCellArrayStates.Count - currentStateIndex - 1);
 	}
 }
