@@ -65,11 +65,11 @@ public partial class GameGridHandler : Node2D
 	private void InitComponents()
 	{
 		var gridSize = GetViewportRect().Size;
-
-		_patternCreator = new PatternCreator();
+		
 		_grid = new Grid(_matrixManipulation, gridSize);
+		_patternCreator = new PatternCreator(_grid);
 		_controller = new GridController(_grid);
-		_inputManager = new InputManager(_grid);
+		_inputManager = new InputManager(_grid, _patternCreator);
 	}
 
 	private void AddComponentsToScene()

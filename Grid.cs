@@ -9,6 +9,10 @@ public partial class Grid: Node2D
 	private static CellPool pool = GameGridHandler.GetCellPool();
 	private readonly Random _random = new ();
 	private Vector2 _gridSize;
+	private Vector2 MoPo { get; set; }
+	private bool ResetHigherGridArray { get; set; }
+	private const float DefaultUpdateTickRate = 0.5f;
+
 	public bool IsMouseDown { get; set; }
 	public bool DrawDeadCell  { get;set;}
 	private Color NewAliveColor { get; set; }
@@ -19,16 +23,12 @@ public partial class Grid: Node2D
 	public bool IsPaused { get; set; }
 	public double TimeElapsed { get; set; }
 	public float UpdateTickRate { get; set; } = 0.5f;
-	public bool ResetHigherGridArray { get; set; }
 	public List<Cell[,]> ListOfCellArrayStates { get; set; } = new(); 
 	public float BoxSize { get; set; } = 10;
 	public bool DebugState { get; set; } = true;
 	public bool DrawCopyBox { get; set; } = false;
-	public Vector2 MoPo { get; set; }
-
-	// Default speed value
-	private const float DefaultUpdateTickRate = 0.5f;
 	
+
 	public void ResetUpdateTickRate()
 	{
 		UpdateTickRate = DefaultUpdateTickRate;
@@ -41,7 +41,7 @@ public partial class Grid: Node2D
 		InitGrid();
 	}
 
-	public void MirrorAndShift()
+	public void ToggleDrawCopyBox()
 	{
 		DrawCopyBox = !DrawCopyBox;
 	}
@@ -218,5 +218,4 @@ public partial class Grid: Node2D
 		(-1, 0),         (1,  0), 
 		(-1, 1), (0, 1), (1,  1)
 	};
-
 }

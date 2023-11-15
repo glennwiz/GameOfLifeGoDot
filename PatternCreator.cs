@@ -5,15 +5,65 @@ namespace GameOfLife;
 
 public partial class PatternCreator : Node2D
 {
+    private readonly Grid _grid;
     static CellPool pool = GameGridHandler.GetCellPool();
     static Random _random = new Random();
+
+    public PatternCreator(Grid grid)
+    {
+        _grid = grid;
+    }
+    
+    public void DrawRabbit01Pattern() //17k pattern?
+    {
+        var rabbit = new PatternCreator.Pattern(PatternCreator.Pattern.Rabit01);
+        _grid.DrawPattern(rabbit);
+    }
+    
+    public void DrawOwlPattern()
+    {
+        var pattern = new PatternCreator.Pattern(PatternCreator.Pattern.CustomPattern);
+        _grid.DrawPattern(pattern);
+    }
+
+    public void DrawRandomPattern()
+    {
+        var randomPattern = PatternCreator.CreateRandomPattern(30, 30, 0.1f);
+        _grid.DrawPattern(randomPattern);
+    }
+
+    public void DrawGliderPattern()
+    {
+        var gliderCells = new[,]
+        {
+            {false, true , false},
+            {false, false, true},
+            {true , true , true}
+        };
+
+        var glider = new PatternCreator.Pattern(gliderCells);
+        _grid.DrawPattern(glider);
+    }
+
+    public void DrawGosperGliderGunPattern()
+    {
+        var rotated = MatrixManipulation.RotateMatrix90(PatternCreator.Pattern.GosperGun);
+        var gosperGliderGun = new PatternCreator.Pattern(rotated);
+        _grid.DrawPattern(gosperGliderGun);
+    }
+		
+    public  void DrawPulsarPattern()
+    {
+        var rotated = MatrixManipulation.RotateMatrix90(PatternCreator.Pattern.Pulsar);
+        var pulsarPattern = new PatternCreator.Pattern(rotated);
+        _grid.DrawPattern(pulsarPattern);
+    }
     
     public class Pattern
     {
         public int Width { get; } 
         public int Height { get; } 
         public bool[,] Cells { get; }
-        
         
         public Pattern(bool[,] cells)
         {
