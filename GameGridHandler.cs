@@ -115,7 +115,7 @@ public partial class GameGridHandler : Node2D
 		var drawRect = _grid.DrawCopyBox
 			? new Rect2(new Vector2(GetGlobalMousePosition().X - boxSize / 2, GetGlobalMousePosition().Y - boxSize / 2),
 				rectSize)
-			: new Rect2(); //TODO: i think i need to move the mouse pos to a 1 time a sec sampler, not for every draw like this
+			: new Rect2(); //TODO: i think i need to move the mouse pos to a 0.1 time a sec sampler, not for every draw like this
 		if (_grid.DrawCopyBox)
 		{
 			DrawRect(drawRect, Colors.Red, false);
@@ -161,6 +161,5 @@ public partial class GameGridHandler : Node2D
 	private void _on_timer_timeout()
 	{
 		GD.Print("TimeOut");
-		
 	}
 }
