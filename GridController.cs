@@ -22,7 +22,11 @@ public partial class GridController : Node2D
         if (_grid.IsPaused) return;
         
         _grid.TimeElapsed += delta;
-        if (!(_grid.TimeElapsed >= _grid.UpdateTickRate)) return;
+        if (!(_grid.TimeElapsed >= _grid.UpdateTickRate))
+        {
+            //GD.Print("TimeElapsed: " + _grid.TimeElapsed);
+            return;
+        }
         
         PerformGridUpdate();
         _grid.TimeElapsed = 0.0;
@@ -30,6 +34,7 @@ public partial class GridController : Node2D
     
     private void PerformGridUpdate()
     {
+        GD.Print("||||||||||GridUpdate|||||||||||||||||||||---------------------------------------");
         _grid.ListOfCellArrayStates[_grid.CurrentStateIndex] = ApplyConwaysRules(_grid.ListOfCellArrayStates[_grid.CurrentStateIndex]);
         _grid.SaveState();
     }
@@ -37,7 +42,7 @@ public partial class GridController : Node2D
     private Cell[,] ApplyConwaysRules(Cell[,] currentGrid)
     { 
         var newGrid = new Cell[_grid.GridWidth, _grid.GridHeight];
-        
+        GD.Print("||||||||||GridUpdate|||||||||||||||||||||---------------------------------------");
         ProcessGridRules(currentGrid, newGrid);
         return newGrid;
     }
@@ -55,51 +60,52 @@ public partial class GridController : Node2D
 
     private Cell GetNewCellByConwaysRules(Cell[,] currentGrid, int x, int y)
     {
+        // Check if the indices are within the bounds of the grid
+        if (x < 0 || x >= currentGrid.GetLength(0) || y < 0 || y >= currentGrid.GetLength(1))
+        {
+            // Handle the edge case, return null
+            return null;
+        }
+
         var liveNeighbors = _grid.CountLiveNeighbors(currentGrid, x, y);
-        if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return pool.GetCell(); 
+        if (liveNeighbors == 0 || liveNeighbors == 1 || liveNeighbors > 3)
+        {
+            return null;
+        }
+
+        // Check the status of the current cell
+        var stateOfCell = currentGrid[x, y]?.IsAlive ?? false;
+
+        // If the cell is alive, it continues to live for the next generation if it has 2 or 3 live neighbors. 
+        // If the cell is dead, it becomes a live cell only in the next generation if it has exactly 3 live neighbors.
+        stateOfCell = stateOfCell 
+            ? (liveNeighbors == 2 || liveNeighbors == 3) 
+            : (liveNeighbors == 3);
+
+        // Get a new cell from the pool and set its properties
         
-        var newCell = InitializeCell(liveNeighbors, currentGrid[x, y]?.IsAlive ?? false, x, y);
-        return newCell;
-    }
-    
-    private Cell GetNewCellByBriansBrainRules(Cell[,] currentGrid, int x, int y)
-    {
-        var liveNeighbors = _grid.CountLiveNeighbors(currentGrid, x, y); // Assuming this function can count states other than "Alive"
-        if (y >= currentGrid.GetLength(1) || x >= currentGrid.GetLength(0)) return pool.GetCell();// Presuming the Cell constructor initializes to Dead
-
-        var currentCell = currentGrid[x, y];
-        var newCell = pool.GetCell(); // Initialize as Dead by default
-    
-        if (currentCell.State == "Alive") {
-            newCell.State = "Dying";
-            newCell.IsAlive = true;
+        Color color;
+        if (_grid.UseRandomColors)
+        {
+            //if the cell in the generation before was alive, keep the color
+            if (currentGrid[x, y] != null && currentGrid[x, y].IsAlive)
+            {
+                color = currentGrid[x, y].Color;
+            }
+            else
+                color = Color.Color8((byte)GD.RandRange(0, 255), (byte)GD.RandRange(0, 255), (byte)GD.RandRange(0, 255));
         }
-        else if (currentCell.State == "Dying") {
-            newCell.State = "Dead";
-            newCell.IsAlive = false;
+        else
+        {
+            color = _grid.GetCellColor(liveNeighbors);
         }
-        else if (currentCell.State == "Dead" && liveNeighbors == 2) {
-            newCell.State = "Alive";
-            newCell.IsAlive = true;
-        }
-        else {
-            newCell.State = currentCell.State;
-            newCell.IsAlive = currentCell.IsAlive;
-        }
-
-        return newCell;
-    }
-    
-    private Cell InitializeCell(int liveNeighbors, bool isAlive, int x, int y)
-    {
-        var cellColor = _grid.GetCellColor(liveNeighbors);
-
+        
         var cell = pool.GetCell();
         cell.LiveNeighbors = liveNeighbors;
-        cell.Color = cellColor;
-        cell.IsAlive = isAlive ? liveNeighbors is 2 or 3 : (liveNeighbors == 3);
+        cell.Color = color;
+        cell.IsAlive = stateOfCell;
         cell.Position = new Vector2(x, y);
-        
+
         return cell;    
     }
 }

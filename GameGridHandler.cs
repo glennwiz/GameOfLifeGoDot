@@ -18,7 +18,7 @@ public partial class GameGridHandler : Node2D
 	
 	public override void _Ready()
 	{
-		var initialPoolSize = 1000; // Adjust based on your grid size/requirements
+		var initialPoolSize = 10000; // Adjust based on your grid size/requirements
 		cellPool = new CellPool(initialPoolSize);
 		
 		InitComponents();
@@ -26,8 +26,6 @@ public partial class GameGridHandler : Node2D
 		DebugPrintAllNodes(this);
 	}
 	
-	
-
 	public override void _Process(double delta)
 	{
 		if (_grid.IsPaused)

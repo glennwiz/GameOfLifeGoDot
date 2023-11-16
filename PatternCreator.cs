@@ -197,13 +197,13 @@ public partial class PatternCreator : Node2D
         return new Pattern(patternCells);
     }
     
-    public static Cell[,] GetInitialGrid(int GridWidth, int GridHeight)
+    public static Cell[,] GetInitialGrid(int gridWidth, int gridHeight)
     {
-        var emptyCellGrid = new Cell[GridWidth, GridHeight];
+        var emptyCellGrid = new Cell[gridWidth, gridHeight];
 
-        for (var i = 0; i < GridWidth; i++)
+        for (var i = 0; i < gridWidth; i++)
         {
-            for (var j = 0; j < GridHeight; j++)
+            for (var j = 0; j < gridHeight; j++)
             {
                 var cellColor = Colors.Black;
                 var isAlive = false;
@@ -241,13 +241,16 @@ public partial class PatternCreator : Node2D
                     isAlive = true;
                 }
 
-                var cell = pool.GetCell();
-                cell.Color = cellColor;
-                cell.IsAlive = isAlive;
-                cell.Position = new Vector2(i, j);
-                cell.State = "Alive";
+                if (isAlive)
+                {
+                    var cell = pool.GetCell();
+                    cell.Color = cellColor;
+                    cell.IsAlive = isAlive;
+                    cell.Position = new Vector2(i, j);
+                    cell.State = "Alive";
                 
-                emptyCellGrid[i, j] = cell;
+                    emptyCellGrid[i, j] = cell;
+                }
             }
         }
 
