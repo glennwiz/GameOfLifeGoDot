@@ -35,7 +35,7 @@ public partial class GridController : Node2D
     private void PerformGridUpdate()
     {
         GD.Print("||||||||||GridUpdate|||||||||||||||||||||---------------------------------------");
-        _grid.ListOfCellArrayStates[_grid.CurrentStateIndex] = ApplyConwaysRules(_grid.ListOfCellArrayStates[_grid.CurrentStateIndex]);
+        _grid.ListOfCellArrayStates[_grid.CurrentSaveStateIndex] = ApplyConwaysRules(_grid.ListOfCellArrayStates[_grid.CurrentSaveStateIndex]);
         _grid.SaveState();
     }
 

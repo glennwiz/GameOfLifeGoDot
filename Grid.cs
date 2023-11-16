@@ -18,7 +18,7 @@ public partial class Grid: Node2D
 	public bool IsMouseDown { get; set; }
 	public bool DrawDeadCell  { get;set;}
 	private Color NewAliveColor { get; set; }
-	public int CurrentStateIndex { get; set; }
+	public int CurrentSaveStateIndex { get; set; }
 	public MatrixManipulation MatrixManipulation { get; }
 	public int GridWidth { get; set; }
 	public int GridHeight { get; set; } 
@@ -81,11 +81,12 @@ public partial class Grid: Node2D
 
 	public void StepForward()
 	{
-		CurrentStateIndex++;
+		CurrentSaveStateIndex++;
+		CounterStateIndex++;
 		
-		if (CurrentStateIndex >= ListOfCellArrayStates.Count)
+		if (CurrentSaveStateIndex >= ListOfCellArrayStates.Count)
 		{
-			CurrentStateIndex = ListOfCellArrayStates.Count - 1;
+			CurrentSaveStateIndex = ListOfCellArrayStates.Count - 1;
 		}
 	}
 
@@ -93,11 +94,13 @@ public partial class Grid: Node2D
 	{
 		ResetHigherGridArray = true;
 		
-		CurrentStateIndex--;
+		CurrentSaveStateIndex--;
+		CounterStateIndex--;
 		
-		if (CurrentStateIndex < 0)
+		
+		if (CurrentSaveStateIndex < 0)
 		{
-			CurrentStateIndex = 0;
+			CurrentSaveStateIndex = 0;
 		}
 	}
 	
@@ -108,7 +111,7 @@ public partial class Grid: Node2D
 
 	public void DrawPattern(PatternCreator.Pattern pattern)
 	{
-		var currentGridState = ListOfCellArrayStates[CurrentStateIndex];
+		var currentGridState = ListOfCellArrayStates[CurrentSaveStateIndex];
 		var patternWidth = pattern.Width;
 		var patternHeight = pattern.Height;
 		var patternCells = pattern.Cells;
@@ -156,7 +159,7 @@ public partial class Grid: Node2D
 			return;
 		}
 
-		var currentGridState = ListOfCellArrayStates[CurrentStateIndex];
+		var currentGridState = ListOfCellArrayStates[CurrentSaveStateIndex];
 		
 		if(currentGridState[x, y] == null)
 		{
@@ -183,20 +186,23 @@ public partial class Grid: Node2D
 	{
 		if(IsPaused) return;
 		
-		var currentGridState = ListOfCellArrayStates[CurrentStateIndex];
+		var currentGridState = ListOfCellArrayStates[CurrentSaveStateIndex];
 		var newGridState = (Cell[,]) currentGridState.Clone();
 		
 		ListOfCellArrayStates.Add(newGridState);
-		CurrentStateIndex++;
-		GD.Print("Generation: " + CurrentStateIndex);
+		CurrentSaveStateIndex++;
+		CounterStateIndex++;
+		GD.Print("Generation: " + CurrentSaveStateIndex);
 
 		// Optionally, limit the history to the last 200 states
 		if (ListOfCellArrayStates.Count <= 200) return;
 		
 		ListOfCellArrayStates.RemoveAt(0);
-		CurrentStateIndex--;
+		CurrentSaveStateIndex--;
 	}
-	
+
+	public int CounterStateIndex { get; set; } = 0;
+
 	public Color GetCellColor(int liveNeighbors)
 	{
 		var cellColor = colorMap.ContainsKey(liveNeighbors) ? colorMap[liveNeighbors] : Colors.Gray;

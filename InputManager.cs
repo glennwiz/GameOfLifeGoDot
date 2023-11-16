@@ -99,7 +99,7 @@ public partial class InputManager : Node2D
 	
 	private void Mirror()
 	{
-		var currentPattern = _grid.ListOfCellArrayStates[_grid.CurrentStateIndex];
+		var currentPattern = _grid.ListOfCellArrayStates[_grid.CurrentSaveStateIndex];
 		var mousePosition = GetGlobalMousePosition();
 		var mousePositionX = (int) (mousePosition.X / _grid.BoxSize);
 		var mousePositionY = (int) (mousePosition.Y / _grid.BoxSize);

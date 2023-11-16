@@ -48,7 +48,7 @@ public class MatrixManipulation
             emptyCellGrid
         };
 
-        grid.CurrentStateIndex = 0;
+        grid.CurrentSaveStateIndex = 0;
     }
 
     public static Cell[,] MirrorMatrix(Cell[,] cellsInsideBox)

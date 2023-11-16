@@ -18,7 +18,7 @@ public partial class GameGridHandler : Node2D
 	
 	public override void _Ready()
 	{
-		var initialPoolSize = 10000; // Adjust based on your grid size/requirements
+		var initialPoolSize = 10000;
 		cellPool = new CellPool(initialPoolSize);
 		
 		InitComponents();
@@ -40,7 +40,7 @@ public partial class GameGridHandler : Node2D
 
 	public override void _Draw()
 	{
-		if (_grid.CurrentStateIndex < 0 || _grid.CurrentStateIndex >= _grid.ListOfCellArrayStates.Count)
+		if (_grid.CurrentSaveStateIndex < 0 || _grid.CurrentSaveStateIndex >= _grid.ListOfCellArrayStates.Count)
 		{
 			return;
 		}
@@ -81,10 +81,42 @@ public partial class GameGridHandler : Node2D
 	{
 		return x < 0 || x >= _grid.GridWidth || y < 0 || y >= _grid.GridHeight;
 	}
+	
+	public Node FindNodeByName(Node parentNode, string nameToFind)
+	{
+		if (parentNode.Name == nameToFind)
+		{
+			return parentNode;
+		}
+
+		foreach (Node child in parentNode.GetChildren())
+		{
+			var foundNode = FindNodeByName(child, nameToFind);
+			if (foundNode != null)
+			{
+				return foundNode;
+			}
+		}
+
+		return null; // Node not found
+	}
+
 
 	private void DrawCells()
 	{
-		var currentGridState = _grid.ListOfCellArrayStates[_grid.CurrentStateIndex];
+		GD.Print("State " + _grid.CurrentSaveStateIndex);
+		
+		//print the parent node
+		var parent = GetParent();
+		GD.Print(parent.Name);
+
+		
+		var genLabel = (RichTextLabel)FindNodeByName(parent, "GenCounter");
+		genLabel.Text = "Gen: " + _grid.CounterStateIndex;
+
+
+		
+		var currentGridState = _grid.ListOfCellArrayStates[_grid.CurrentSaveStateIndex];
 		var gridStateWidth = currentGridState.GetLength(0);
 		var gridStateHeight = currentGridState.GetLength(1);
 		var gridWidth = Math.Min(_grid.GridWidth, gridStateWidth);
