@@ -12,6 +12,8 @@ public partial class Grid: Node2D
 	private Vector2 MoPo { get; set; }
 	private bool ResetHigherGridArray { get; set; }
 	private const float DefaultUpdateTickRate = 0.5f;
+	
+	
 
 	public bool IsMouseDown { get; set; }
 	public bool DrawDeadCell  { get;set;}
@@ -27,7 +29,7 @@ public partial class Grid: Node2D
 	public float BoxSize { get; set; } = 10;
 	public bool DebugState { get; set; } = true;
 	public bool DrawCopyBox { get; set; } = false;
-	
+	public bool UseRandomColors = false;
 
 	public void ResetUpdateTickRate()
 	{
@@ -168,6 +170,13 @@ public partial class Grid: Node2D
 		}
 		
 		currentGridState[x, y].IsAlive = !currentGridState[x, y].IsAlive;
+		
+		if (!currentGridState[x, y].IsAlive)
+		{
+			GD.Print("released cell");
+			pool.ReleaseCell(currentGridState[x, y]);
+		}
+		
 	}
 
 	public void SaveState()
@@ -218,4 +227,9 @@ public partial class Grid: Node2D
 		(-1, 0),         (1,  0), 
 		(-1, 1), (0, 1), (1,  1)
 	};
+
+	public void SetRandomColors()
+	{
+		UseRandomColors = !UseRandomColors;
+	}
 }

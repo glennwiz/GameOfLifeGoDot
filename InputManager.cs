@@ -51,6 +51,8 @@ public partial class InputManager : Node2D
 				}
 			},
 			
+			{Key.H, () => _grid.SetRandomColors()},
+			
 			{Key.Key1, () => _patternCreator.DrawGliderPattern()},
 			{Key.Key2, () => _patternCreator.DrawGosperGliderGunPattern()},
 			{Key.Key3, () => _patternCreator.DrawPulsarPattern()},
