@@ -74,7 +74,7 @@ public partial class GridController : Node2D
         }
 
         // Check the status of the current cell
-        bool stateOfCell = currentGrid[x, y]?.IsAlive ?? false;
+        var stateOfCell = currentGrid[x, y]?.IsAlive ?? false;
 
         // If the cell is alive, it continues to live for the next generation if it has 2 or 3 live neighbors. 
         // If the cell is dead, it becomes a live cell only in the next generation if it has exactly 3 live neighbors.
@@ -83,11 +83,17 @@ public partial class GridController : Node2D
             : (liveNeighbors == 3);
 
         // Get a new cell from the pool and set its properties
-        //set random color
+        
         Color color;
         if (_grid.UseRandomColors)
         {
-            color = Color.Color8((byte)GD.RandRange(0, 255), (byte)GD.RandRange(0, 255), (byte)GD.RandRange(0, 255));
+            //if the cell in the generation before was alive, keep the color
+            if (currentGrid[x, y] != null && currentGrid[x, y].IsAlive)
+            {
+                color = currentGrid[x, y].Color;
+            }
+            else
+                color = Color.Color8((byte)GD.RandRange(0, 255), (byte)GD.RandRange(0, 255), (byte)GD.RandRange(0, 255));
         }
         else
         {
